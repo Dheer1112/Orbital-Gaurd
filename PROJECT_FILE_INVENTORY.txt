@@ -1,0 +1,85 @@
+ORBITAL_GUARD/ — complete file inventory (Phase 0–3 freeze)
+
+ORBITAL_GUARD/
+├── README.md                          # Project overview & quick start
+├── requirements.txt                   # Python dependencies (sgp4, numpy, scipy, sklearn, pandas, joblib)
+├── REUSE_MAP.md                       # Phase 0 open-source reuse map (also under docs/)
+├── PROJECT_HISTORY.md                 # Chronological engineering history
+├── WHAT_WE_BUILT.md                   # Plain-language system explanation
+├── JUDGE_QA.md                        # Predicted judge questions & answers
+├── PRESENTATION_GUARDRAILS.md         # Claims we must NOT make
+├── RUN_PROJECT.md                     # Reproduction guide
+├── BENCHMARK_SUMMARY.md               # All measured metrics
+├── PROJECT_FILE_INVENTORY.txt         # This file
+├── FINAL_VERIFICATION.txt             # Handoff verification log
+│
+├── run_simulation.py                  # Phase 1 CLI: full deterministic pipeline
+├── run_phase2.py                      # Phase 2 orchestrator: dataset + train + benchmark
+├── run_demo.py                        # Demo scenarios (HIGH_RISK, NO_MANEUVER, …)
+│
+├── docs/
+│   ├── ARCHITECTURE.md                # Ground + edge architecture
+│   ├── REUSE_MAP.md                   # Copy of Phase 0 reuse map
+│   ├── PHASE_1.md                     # Deterministic pipeline report
+│   ├── PHASE_2.md                     # Edge ML report
+│   ├── PHASE_3.md                     # Hardening + demo report
+│   └── EDGE_FAILURE_ANALYSIS.md       # Analysis of 80% safety / 21% fallback
+│
+├── backend/
+│   ├── __init__.py
+│   ├── data/
+│   │   ├── orbital_object.py          # OrbitalObject dataclass (name, NORAD, TLE)
+│   │   ├── tle_loader.py              # CelesTrak fetch, cache, synthetic pair, parse
+│   │   └── cdm_parser.py              # Thin CDM KVN parser + synthetic CDM wrapper
+│   ├── propagation/
+│   │   └── sgp4_engine.py             # SGP4 wrapper; TEME km/km/s; relative state
+│   ├── conjunction/
+│   │   ├── event.py                   # ConjunctionEvent structure
+│   │   └── screening.py               # Grid + Brent close-approach screening
+│   ├── risk/
+│   │   └── risk_model.py              # Risk score + approximate isotropic Pc estimate
+│   ├── maneuver/
+│   │   ├── generator.py               # Collinear/radial Δv candidate grid
+│   │   ├── simulator.py               # First-order Δr ≈ Δv·Δt maneuver effect
+│   │   └── ranking.py                 # Transparent weighted scoring & ranking
+│   └── scenarios/
+│       ├── action_space.py            # Fixed 10-action discrete space for edge
+│       ├── generator.py               # Synthetic scenario generator (risk bands)
+│       ├── dataset.py                 # Rows, scenario-safe split, CSV export
+│       └── demo_scenarios.py          # Four deterministic demo scenarios
+│
+├── edge/
+│   ├── model/
+│   │   └── train.py                   # Train/compare logistic, tree, RF, GBDT, MLP
+│   ├── preprocessing/
+│   │   └── features.py                # Feature column definitions
+│   ├── inference/
+│   │   └── predict.py                 # EdgeModel + confidence + safety fallback
+│   └── benchmark/
+│       └── run_benchmark.py           # Ground vs edge metrics on test set
+│
+├── datasets/
+│   ├── train.csv                      # 350 scenarios × 10 actions
+│   ├── validation.csv                 # 75 scenarios
+│   ├── test.csv                       # 75 scenarios
+│   └── scenario_summary.csv           # Per-scenario labels & risk
+│
+├── models/
+│   └── edge/
+│       ├── gbdt.joblib                # Selected edge model (~74 KB)
+│       ├── logistic.joblib
+│       ├── decision_tree.joblib
+│       ├── random_forest.joblib
+│       ├── tiny_mlp.joblib
+│       ├── training_results.json      # Val metrics per model
+│       ├── benchmark_report.json      # Ground vs edge test report
+│       ├── phase3_experiments.json    # Ablations, noise, shift, confidence curve
+│       ├── test_case_analysis.csv     # Per-scenario analysis
+│       └── failure_cases.csv          # 16 unsafe-before-fallback cases
+│
+└── tests/
+    └── test_phase1.py                 # Unit tests: TLE parse, SGP4, risk, full loop
+
+Notes:
+- No .git, venv, __pycache__, secrets, or API keys included.
+- TLE cache directory is not shipped; live CelesTrak creates it at runtime if used.

@@ -1,0 +1,38 @@
+FINAL_VERIFICATION.txt — ORBITAL GUARD handoff freeze
+=====================================================
+
+Timestamp (UTC approx): 2026-08-16
+Python version: 3.12.3
+OS: Linux
+
+TEST RESULT
+-----------
+Command: python -m pytest tests/ -v
+Result: 13 passed in ~15s
+  Phase1: 5 passed
+  Phase3 service/CDM/demo: 8 passed
+
+DEMO RESULTS (run_demo.py)
+--------------------------
+HIGH_RISK:   FALLBACK (expected; residual miss ~0.15 km)
+NO_MANEUVER: PASS
+LOW_COST:    PASS
+AMBIGUOUS:   PASS
+
+ARTIFACTS
+---------
+models/edge/gbdt.joblib YES
+datasets/*.csv YES
+docs complete YES
+service API backend/service.py YES
+FRONTEND_INTEGRATION.md YES
+
+SECRETS: none found
+MACHINE-SPECIFIC PATHS: none required for offline demo
+
+KNOWN LIMITATIONS
+-----------------
+Synthetic-primary metrics; approximate risk; first-order burns;
+critical action-space limits; no HTTP server; no 3D UI; not flight software.
+
+PROJECT STATUS: FROZEN for handoff
