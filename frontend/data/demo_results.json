@@ -1,0 +1,878 @@
+{
+  "HIGH_RISK": {
+    "status": "ok",
+    "mode": "OFFLINE_DEMO",
+    "scenario_key": "HIGH_RISK",
+    "scenario_id": "sc_00101_116586d062",
+    "demo_label": "High-risk conjunction \u2014 residual risk may need fallback",
+    "units": {
+      "position": "km",
+      "velocity": "km/s",
+      "delta_v": "m/s",
+      "time_to_tca": "minutes",
+      "latency": "ms"
+    },
+    "target": {
+      "name": "DEMO-SAT-01 (ISS-like)",
+      "norad_id": 25544,
+      "object_type": "PAYLOAD"
+    },
+    "threat": {
+      "name": "SYNTH-THREAT",
+      "norad_id": 96082,
+      "object_type": "DEBRIS"
+    },
+    "conjunction": {
+      "tca_iso": "2026-08-16T17:27:07.615961+00:00",
+      "time_to_tca_min": 341.36572685,
+      "miss_distance_km": 0.15017420300321355,
+      "relative_position_km": [
+        0.08997924978409949,
+        0.11100757416728513,
+        -0.04618814061461791
+      ],
+      "relative_velocity_km_s": [
+        8.908117040576556,
+        5.5248730440589116,
+        3.6855427144659063
+      ],
+      "relative_speed_km_s": 11.111345393863514
+    },
+    "risk": {
+      "risk_score_0_1": 0.9969965159399358,
+      "approx_collision_risk_estimate": 0.00019773788754630234,
+      "risk_status": "HIGH",
+      "note": "Approximate screening estimate \u2014 NOT official NASA CARA Pc"
+    },
+    "candidates": [
+      {
+        "action_id": 0,
+        "action_name": "NO_MANEUVER",
+        "direction": "none",
+        "delta_v_mps": 0.0,
+        "time_offset_min": 0.0,
+        "new_miss_km": 0.15017420300321355,
+        "new_pc_approx": 0.00019773788754630234,
+        "score": 0.0015017420300321356,
+        "is_ground_optimal": 1,
+        "meets_safety_threshold": 0
+      },
+      {
+        "action_id": 1,
+        "action_name": "ALONG_0.05",
+        "direction": "along",
+        "delta_v_mps": 0.05,
+        "time_offset_min": 45.0,
+        "new_miss_km": 0.08558848052897619,
+        "new_pc_approx": 0.00019924894918029335,
+        "score": -0.03485840090899596,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 0
+      },
+      {
+        "action_id": 2,
+        "action_name": "ALONG_0.15",
+        "direction": "along",
+        "delta_v_mps": 0.15,
+        "time_offset_min": 45.0,
+        "new_miss_km": 0.29363511626247296,
+        "new_pc_approx": 0.00019154272512619667,
+        "score": -0.10420650598023243,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 0
+      },
+      {
+        "action_id": 3,
+        "action_name": "ALONG_0.30",
+        "direction": "along",
+        "delta_v_mps": 0.3,
+        "time_offset_min": 60.0,
+        "new_miss_km": 1.0970120226800864,
+        "new_pc_approx": 0.00010956958735253035,
+        "score": -0.10458451201770566,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 4,
+        "action_name": "AGAINST_0.05",
+        "direction": "against",
+        "delta_v_mps": 0.05,
+        "time_offset_min": 45.0,
+        "new_miss_km": 0.27245035235073906,
+        "new_pc_approx": 0.0001926945871268536,
+        "score": -0.032989782190778326,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 0
+      },
+      {
+        "action_id": 5,
+        "action_name": "AGAINST_0.15",
+        "direction": "against",
+        "delta_v_mps": 0.15,
+        "time_offset_min": 45.0,
+        "new_miss_km": 0.5356612744942691,
+        "new_pc_approx": 0.0001732551244983831,
+        "score": -0.05357672969343023,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 6,
+        "action_name": "AGAINST_0.30",
+        "direction": "against",
+        "delta_v_mps": 0.3,
+        "time_offset_min": 60.0,
+        "new_miss_km": 1.0837293041118001,
+        "new_pc_approx": 0.00011116787951865605,
+        "score": -0.10591278387453429,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 7,
+        "action_name": "RADIAL_OUT_0.10",
+        "direction": "radial_out",
+        "delta_v_mps": 0.1,
+        "time_offset_min": 45.0,
+        "new_miss_km": 0.37511071522773,
+        "new_pc_approx": 0.00018639542946388574,
+        "score": -0.06767746427629413,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 0
+      },
+      {
+        "action_id": 8,
+        "action_name": "RADIAL_IN_0.10",
+        "direction": "radial_in",
+        "delta_v_mps": 0.1,
+        "time_offset_min": 45.0,
+        "new_miss_km": 0.2240458297238349,
+        "new_pc_approx": 0.00019502380230459036,
+        "score": -0.06918811313133309,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 0
+      },
+      {
+        "action_id": 9,
+        "action_name": "ALONG_0.50",
+        "direction": "along",
+        "delta_v_mps": 0.5,
+        "time_offset_min": 90.0,
+        "new_miss_km": 2.8307197708501675,
+        "new_pc_approx": 3.640535439763773e-06,
+        "score": -0.0740708800578404,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      }
+    ],
+    "ground": {
+      "optimal_action_id": 0,
+      "optimal_action_name": "NO_MANEUVER",
+      "optimal_score": 0.0015017420300321356,
+      "any_candidate_meets_safety": 1
+    },
+    "edge": {
+      "model": "GradientBoostingClassifier",
+      "model_path": "models/edge/gbdt.joblib",
+      "selected_action_id": 0,
+      "selected_action_name": "NO_MANEUVER",
+      "confidence": 0.9856109680770974,
+      "inference_ms": 1.9512650000024223,
+      "scores": {
+        "0": 0.9856109680770974,
+        "1": 0.0019813859827898807,
+        "2": 0.0018629161737331937,
+        "3": 0.0018629161737331937,
+        "4": 0.002571042946319569,
+        "5": 0.0020181480902826563,
+        "6": 0.0020181480902826563,
+        "7": 0.0018629161737331937,
+        "8": 0.0018629161737331937,
+        "9": 0.0018629161737331937
+      }
+    },
+    "safety_gate": {
+      "threshold_miss_km": 0.5,
+      "passed": 0,
+      "used_fallback": 1,
+      "reason": "safety_check_failed (new_miss=0.150 km)",
+      "no_safe_candidate_in_action_space": 0
+    },
+    "fallback": {
+      "activated": 1,
+      "method": "ground_optimal_or_safest_scored",
+      "note": "Ground fallback re-evaluates available candidates using deterministic ground-side logic. It does NOT mathematically guarantee safety if no candidate clears the threshold."
+    },
+    "final_decision": {
+      "action_id": 0,
+      "action_name": "NO_MANEUVER",
+      "delta_v_mps": 0.0,
+      "predicted_miss_km": 0.15017420300321355,
+      "meets_safety_threshold": 0
+    },
+    "explanation": "Edge selection rejected (safety_check_failed (new_miss=0.150 km)). Deterministic ground-side fallback applied \u2192 action 0 (NO_MANEUVER).",
+    "latency": {
+      "edge_inference_ms": 1.9512650000024223,
+      "service_total_ms": 2.565072999999529
+    },
+    "architecture_note": "Ground: SGP4 \u00b7 screening \u00b7 approximate risk \u00b7 fixed candidates \u00b7 scoring. Edge: compact state \u00b7 GBDT ranker \u00b7 safety gate \u00b7 fallback. Simulation / decision support only \u2014 NOT flight software."
+  },
+  "LOW_COST": {
+    "status": "ok",
+    "mode": "OFFLINE_DEMO",
+    "scenario_key": "LOW_COST",
+    "scenario_id": "sc_00202_43b0033b33",
+    "demo_label": "High risk with a low-\u0394v avoidance available",
+    "units": {
+      "position": "km",
+      "velocity": "km/s",
+      "delta_v": "m/s",
+      "time_to_tca": "minutes",
+      "latency": "ms"
+    },
+    "target": {
+      "name": "DEMO-SAT-01 (ISS-like)",
+      "norad_id": 25544,
+      "object_type": "PAYLOAD"
+    },
+    "threat": {
+      "name": "SYNTH-THREAT",
+      "norad_id": 93393,
+      "object_type": "DEBRIS"
+    },
+    "conjunction": {
+      "tca_iso": "2026-08-16T14:10:02.766759+00:00",
+      "time_to_tca_min": 144.27487496666666,
+      "miss_distance_km": 0.9707634297526567,
+      "relative_position_km": [
+        -0.645138831366477,
+        -0.23883760297896342,
+        -0.6849336640956558
+      ],
+      "relative_velocity_km_s": [
+        2.749198971034565,
+        1.9922486019292973,
+        4.4050628381938335
+      ],
+      "relative_speed_km_s": 5.561629984335803
+    },
+    "risk": {
+      "risk_score_0_1": 0.9805847314049468,
+      "approx_collision_risk_estimate": 0.00012484508736398416,
+      "risk_status": "HIGH",
+      "note": "Approximate screening estimate \u2014 NOT official NASA CARA Pc"
+    },
+    "candidates": [
+      {
+        "action_id": 0,
+        "action_name": "NO_MANEUVER",
+        "direction": "none",
+        "delta_v_mps": 0.0,
+        "time_offset_min": 0.0,
+        "new_miss_km": 0.9707634297526567,
+        "new_pc_approx": 0.00012484508736398416,
+        "score": 0.09707634297526567,
+        "is_ground_optimal": 1,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 1,
+        "action_name": "ALONG_0.05",
+        "direction": "along",
+        "delta_v_mps": 0.05,
+        "time_offset_min": 45.0,
+        "new_miss_km": 0.92685449893547,
+        "new_pc_approx": 0.00013015560407729845,
+        "score": 0.056971164179261284,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 2,
+        "action_name": "ALONG_0.15",
+        "direction": "along",
+        "delta_v_mps": 0.15,
+        "time_offset_min": 45.0,
+        "new_miss_km": 0.8954130407250503,
+        "new_pc_approx": 0.00013393775793453045,
+        "score": -0.01760155307035212,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 3,
+        "action_name": "ALONG_0.30",
+        "direction": "along",
+        "delta_v_mps": 0.3,
+        "time_offset_min": 60.0,
+        "new_miss_km": 0.9124049040888453,
+        "new_pc_approx": 0.00013189651489128008,
+        "score": -0.12304522387682977,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 4,
+        "action_name": "AGAINST_0.05",
+        "direction": "against",
+        "delta_v_mps": 0.05,
+        "time_offset_min": 45.0,
+        "new_miss_km": 1.0306085633708666,
+        "new_pc_approx": 0.00011758876186095795,
+        "score": 0.06734657062280094,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 5,
+        "action_name": "AGAINST_0.15",
+        "direction": "against",
+        "delta_v_mps": 0.15,
+        "time_offset_min": 45.0,
+        "new_miss_km": 1.1878757340689312,
+        "new_pc_approx": 9.876699963186732e-05,
+        "score": 0.011644716264035973,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 6,
+        "action_name": "AGAINST_0.30",
+        "direction": "against",
+        "delta_v_mps": 0.3,
+        "time_offset_min": 60.0,
+        "new_miss_km": 1.8398588435216732,
+        "new_pc_approx": 3.6812826351545655e-05,
+        "score": -0.03029982993354699,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 7,
+        "action_name": "RADIAL_OUT_0.10",
+        "direction": "radial_out",
+        "delta_v_mps": 0.1,
+        "time_offset_min": 45.0,
+        "new_miss_km": 0.8746588453351292,
+        "new_pc_approx": 0.0001364204377778939,
+        "score": 0.016037313104941484,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 8,
+        "action_name": "RADIAL_IN_0.10",
+        "direction": "radial_in",
+        "delta_v_mps": 0.1,
+        "time_offset_min": 45.0,
+        "new_miss_km": 1.1249600781215754,
+        "new_pc_approx": 0.00010622006780042026,
+        "score": 0.041067436383586106,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 9,
+        "action_name": "ALONG_0.50",
+        "direction": "along",
+        "delta_v_mps": 0.5,
+        "time_offset_min": 90.0,
+        "new_miss_km": 3.174752189569648,
+        "new_pc_approx": 1.2958871793137566e-06,
+        "score": -0.03966763818589231,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      }
+    ],
+    "ground": {
+      "optimal_action_id": 0,
+      "optimal_action_name": "NO_MANEUVER",
+      "optimal_score": 0.09707634297526567,
+      "any_candidate_meets_safety": 1
+    },
+    "edge": {
+      "model": "GradientBoostingClassifier",
+      "model_path": "models/edge/gbdt.joblib",
+      "selected_action_id": 0,
+      "selected_action_name": "NO_MANEUVER",
+      "confidence": 0.9856109680770974,
+      "inference_ms": 1.2295129999984056,
+      "scores": {
+        "0": 0.9856109680770974,
+        "1": 0.0018842116572321988,
+        "2": 0.0018112536180096442,
+        "3": 0.0018112536180096442,
+        "4": 0.0017367924004241533,
+        "5": 0.001774370385439382,
+        "6": 0.001774370385439382,
+        "7": 0.0018112536180096442,
+        "8": 0.0018112536180096442,
+        "9": 0.0018112536180096442
+      }
+    },
+    "safety_gate": {
+      "threshold_miss_km": 0.5,
+      "passed": 1,
+      "used_fallback": 0,
+      "reason": "edge_selected",
+      "no_safe_candidate_in_action_space": 0
+    },
+    "fallback": {
+      "activated": 0,
+      "method": null,
+      "note": "Ground fallback re-evaluates available candidates using deterministic ground-side logic. It does NOT mathematically guarantee safety if no candidate clears the threshold."
+    },
+    "final_decision": {
+      "action_id": 0,
+      "action_name": "NO_MANEUVER",
+      "delta_v_mps": 0.0,
+      "predicted_miss_km": 0.9707634297526567,
+      "meets_safety_threshold": 1
+    },
+    "explanation": "Edge selected action 0 (NO_MANEUVER) with confidence 0.986; safety gate PASS.",
+    "latency": {
+      "edge_inference_ms": 1.2295129999984056,
+      "service_total_ms": 1.7329970000048434
+    },
+    "architecture_note": "Ground: SGP4 \u00b7 screening \u00b7 approximate risk \u00b7 fixed candidates \u00b7 scoring. Edge: compact state \u00b7 GBDT ranker \u00b7 safety gate \u00b7 fallback. Simulation / decision support only \u2014 NOT flight software."
+  },
+  "AMBIGUOUS": {
+    "status": "ok",
+    "mode": "OFFLINE_DEMO",
+    "scenario_key": "AMBIGUOUS",
+    "scenario_id": "sc_00303_5b9dcfd7f8",
+    "demo_label": "Medium risk \u2014 edge ranking among similar candidates",
+    "units": {
+      "position": "km",
+      "velocity": "km/s",
+      "delta_v": "m/s",
+      "time_to_tca": "minutes",
+      "latency": "ms"
+    },
+    "target": {
+      "name": "DEMO-SAT-01 (ISS-like)",
+      "norad_id": 25544,
+      "object_type": "PAYLOAD"
+    },
+    "threat": {
+      "name": "SYNTH-THREAT",
+      "norad_id": 97197,
+      "object_type": "DEBRIS"
+    },
+    "conjunction": {
+      "tca_iso": "2026-08-16T13:26:32.047832+00:00",
+      "time_to_tca_min": 100.76269831666667,
+      "miss_distance_km": 3.9177527460525434,
+      "relative_position_km": [
+        -3.029502284047555,
+        0.8168669174588908,
+        -2.3459818689227125
+      ],
+      "relative_velocity_km_s": [
+        -0.9280497245124235,
+        -0.8939241493150356,
+        -1.1659774758281058
+      ],
+      "relative_speed_km_s": 1.7377802364035206
+    },
+    "risk": {
+      "risk_score_0_1": 0.9216449450789491,
+      "approx_collision_risk_estimate": 9.297649539498935e-08,
+      "risk_status": "LOW",
+      "note": "Approximate screening estimate \u2014 NOT official NASA CARA Pc"
+    },
+    "candidates": [
+      {
+        "action_id": 0,
+        "action_name": "NO_MANEUVER",
+        "direction": "none",
+        "delta_v_mps": 0.0,
+        "time_offset_min": 0.0,
+        "new_miss_km": 3.9177527460525434,
+        "new_pc_approx": 9.297649539498935e-08,
+        "score": 0.39177527460525435,
+        "is_ground_optimal": 1,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 1,
+        "action_name": "ALONG_0.05",
+        "direction": "along",
+        "delta_v_mps": 0.05,
+        "time_offset_min": 45.0,
+        "new_miss_km": 3.9200882053147654,
+        "new_pc_approx": 9.212949664305111e-08,
+        "score": 0.35629453481719087,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 2,
+        "action_name": "ALONG_0.15",
+        "direction": "along",
+        "delta_v_mps": 0.15,
+        "time_offset_min": 45.0,
+        "new_miss_km": 3.938661124537032,
+        "new_pc_approx": 8.564599799491935e-08,
+        "score": 0.286723255310846,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 3,
+        "action_name": "ALONG_0.30",
+        "direction": "along",
+        "delta_v_mps": 0.3,
+        "time_offset_min": 60.0,
+        "new_miss_km": 4.2466571789571885,
+        "new_pc_approx": 2.4284193548273934e-08,
+        "score": 0.21038000361000453,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 4,
+        "action_name": "AGAINST_0.05",
+        "direction": "against",
+        "delta_v_mps": 0.05,
+        "time_offset_min": 45.0,
+        "new_miss_km": 3.9200678082090055,
+        "new_pc_approx": 9.213686271385715e-08,
+        "score": 0.35629249510661487,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 5,
+        "action_name": "AGAINST_0.15",
+        "direction": "against",
+        "delta_v_mps": 0.15,
+        "time_offset_min": 45.0,
+        "new_miss_km": 3.9386002214575138,
+        "new_pc_approx": 8.566654271567865e-08,
+        "score": 0.28671716500289424,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 6,
+        "action_name": "AGAINST_0.30",
+        "direction": "against",
+        "delta_v_mps": 0.3,
+        "time_offset_min": 60.0,
+        "new_miss_km": 3.8725025452303927,
+        "new_pc_approx": 1.1089506656684954e-07,
+        "score": 0.172964540237325,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 7,
+        "action_name": "RADIAL_OUT_0.10",
+        "direction": "radial_out",
+        "delta_v_mps": 0.1,
+        "time_offset_min": 45.0,
+        "new_miss_km": 3.983537262501702,
+        "new_pc_approx": 7.169933256040162e-08,
+        "score": 0.32692515482159873,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 8,
+        "action_name": "RADIAL_IN_0.10",
+        "direction": "radial_in",
+        "delta_v_mps": 0.1,
+        "time_offset_min": 45.0,
+        "new_miss_km": 3.869729194228576,
+        "new_pc_approx": 1.1209192544247438e-07,
+        "score": 0.31554434799428616,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 9,
+        "action_name": "ALONG_0.50",
+        "direction": "along",
+        "delta_v_mps": 0.5,
+        "time_offset_min": 90.0,
+        "new_miss_km": 4.795892714190671,
+        "new_pc_approx": 2.027551894250248e-09,
+        "score": 0.12244641427621,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      }
+    ],
+    "ground": {
+      "optimal_action_id": 0,
+      "optimal_action_name": "NO_MANEUVER",
+      "optimal_score": 0.39177527460525435,
+      "any_candidate_meets_safety": 1
+    },
+    "edge": {
+      "model": "GradientBoostingClassifier",
+      "model_path": "models/edge/gbdt.joblib",
+      "selected_action_id": 0,
+      "selected_action_name": "NO_MANEUVER",
+      "confidence": 0.9856109680770974,
+      "inference_ms": 1.1114680000048338,
+      "scores": {
+        "0": 0.9856109680770974,
+        "1": 0.0018842116572321988,
+        "2": 0.0018112536180096442,
+        "3": 0.0018112536180096442,
+        "4": 0.0017367924004241533,
+        "5": 0.001774370385439382,
+        "6": 0.001774370385439382,
+        "7": 0.0018112536180096442,
+        "8": 0.0018112536180096442,
+        "9": 0.0018112536180096442
+      }
+    },
+    "safety_gate": {
+      "threshold_miss_km": 0.5,
+      "passed": 1,
+      "used_fallback": 0,
+      "reason": "edge_selected",
+      "no_safe_candidate_in_action_space": 0
+    },
+    "fallback": {
+      "activated": 0,
+      "method": null,
+      "note": "Ground fallback re-evaluates available candidates using deterministic ground-side logic. It does NOT mathematically guarantee safety if no candidate clears the threshold."
+    },
+    "final_decision": {
+      "action_id": 0,
+      "action_name": "NO_MANEUVER",
+      "delta_v_mps": 0.0,
+      "predicted_miss_km": 3.9177527460525434,
+      "meets_safety_threshold": 1
+    },
+    "explanation": "Edge selected action 0 (NO_MANEUVER) with confidence 0.986; safety gate PASS.",
+    "latency": {
+      "edge_inference_ms": 1.1114680000048338,
+      "service_total_ms": 1.6173249999837935
+    },
+    "architecture_note": "Ground: SGP4 \u00b7 screening \u00b7 approximate risk \u00b7 fixed candidates \u00b7 scoring. Edge: compact state \u00b7 GBDT ranker \u00b7 safety gate \u00b7 fallback. Simulation / decision support only \u2014 NOT flight software."
+  },
+  "NO_MANEUVER": {
+    "status": "ok",
+    "mode": "OFFLINE_DEMO",
+    "scenario_key": "NO_MANEUVER",
+    "scenario_id": "sc_00404_0b74905de9",
+    "demo_label": "Low risk \u2014 no maneuver required",
+    "units": {
+      "position": "km",
+      "velocity": "km/s",
+      "delta_v": "m/s",
+      "time_to_tca": "minutes",
+      "latency": "ms"
+    },
+    "target": {
+      "name": "DEMO-SAT-01 (ISS-like)",
+      "norad_id": 25544,
+      "object_type": "PAYLOAD"
+    },
+    "threat": {
+      "name": "SYNTH-THREAT",
+      "norad_id": 92075,
+      "object_type": "DEBRIS"
+    },
+    "conjunction": {
+      "tca_iso": "2026-08-16T13:55:43.802477+00:00",
+      "time_to_tca_min": 129.95844325,
+      "miss_distance_km": 20.833385689278362,
+      "relative_position_km": [
+        9.092891924613323,
+        17.771740934232955,
+        5.959404323591332
+      ],
+      "relative_velocity_km_s": [
+        0.7141480475017992,
+        3.2819040780946906,
+        -3.513210197230057
+      ],
+      "relative_speed_km_s": 4.860406125159342
+    },
+    "risk": {
+      "risk_score_0_1": 0.5833322862144328,
+      "approx_collision_risk_estimate": 1.1534594174522635e-98,
+      "risk_status": "LOW",
+      "note": "Approximate screening estimate \u2014 NOT official NASA CARA Pc"
+    },
+    "candidates": [
+      {
+        "action_id": 0,
+        "action_name": "NO_MANEUVER",
+        "direction": "none",
+        "delta_v_mps": 0.0,
+        "time_offset_min": 0.0,
+        "new_miss_km": 20.833385689278362,
+        "new_pc_approx": 1.1534594174522635e-98,
+        "score": 1.0,
+        "is_ground_optimal": 1,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 1,
+        "action_name": "ALONG_0.05",
+        "direction": "along",
+        "delta_v_mps": 0.05,
+        "time_offset_min": 45.0,
+        "new_miss_km": 20.966348276825773,
+        "new_pc_approx": 7.16575386511119e-100,
+        "score": 0.9642857142857143,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 2,
+        "action_name": "ALONG_0.15",
+        "direction": "along",
+        "delta_v_mps": 0.15,
+        "time_offset_min": 45.0,
+        "new_miss_km": 21.232350591467924,
+        "new_pc_approx": 2.6184141839394953e-102,
+        "score": 0.8928571428571428,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 3,
+        "action_name": "ALONG_0.30",
+        "direction": "along",
+        "delta_v_mps": 0.3,
+        "time_offset_min": 60.0,
+        "new_miss_km": 21.50596436145919,
+        "new_pc_approx": 7.568637259139299e-105,
+        "score": 0.7857142857142857,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 4,
+        "action_name": "AGAINST_0.05",
+        "direction": "against",
+        "delta_v_mps": 0.05,
+        "time_offset_min": 45.0,
+        "new_miss_km": 20.700449475586318,
+        "new_pc_approx": 1.8231757105822449e-97,
+        "score": 0.9642857142857143,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 5,
+        "action_name": "AGAINST_0.15",
+        "direction": "against",
+        "delta_v_mps": 0.15,
+        "time_offset_min": 45.0,
+        "new_miss_km": 20.434658228545167,
+        "new_pc_approx": 4.3125909175761276e-95,
+        "score": 0.8928571428571428,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 6,
+        "action_name": "AGAINST_0.30",
+        "direction": "against",
+        "delta_v_mps": 0.3,
+        "time_offset_min": 60.0,
+        "new_miss_km": 20.196193092761423,
+        "new_pc_approx": 5.4761648634643975e-93,
+        "score": 0.7857142857142857,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 7,
+        "action_name": "RADIAL_OUT_0.10",
+        "direction": "radial_out",
+        "delta_v_mps": 0.1,
+        "time_offset_min": 45.0,
+        "new_miss_km": 20.865184115334518,
+        "new_pc_approx": 5.944358125024747e-99,
+        "score": 0.9285714285714286,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 8,
+        "action_name": "RADIAL_IN_0.10",
+        "direction": "radial_in",
+        "delta_v_mps": 0.1,
+        "time_offset_min": 45.0,
+        "new_miss_km": 20.80504290766181,
+        "new_pc_approx": 2.0808595606517866e-98,
+        "score": 0.9285714285714286,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      },
+      {
+        "action_id": 9,
+        "action_name": "ALONG_0.50",
+        "direction": "along",
+        "delta_v_mps": 0.5,
+        "time_offset_min": 90.0,
+        "new_miss_km": 18.21462768533704,
+        "new_pc_approx": 1.8393826477515564e-76,
+        "score": 0.6428571428571428,
+        "is_ground_optimal": 0,
+        "meets_safety_threshold": 1
+      }
+    ],
+    "ground": {
+      "optimal_action_id": 0,
+      "optimal_action_name": "NO_MANEUVER",
+      "optimal_score": 1.0,
+      "any_candidate_meets_safety": 1
+    },
+    "edge": {
+      "model": "GradientBoostingClassifier",
+      "model_path": "models/edge/gbdt.joblib",
+      "selected_action_id": 0,
+      "selected_action_name": "NO_MANEUVER",
+      "confidence": 0.9856109680770974,
+      "inference_ms": 1.2144969999781097,
+      "scores": {
+        "0": 0.9856109680770974,
+        "1": 0.0018187736382547321,
+        "2": 0.0018382558669430863,
+        "3": 0.0018382558669430863,
+        "4": 0.001967224939015618,
+        "5": 0.0019888223247506464,
+        "6": 0.0019888223247506464,
+        "7": 0.0018382558669430863,
+        "8": 0.0018382558669430863,
+        "9": 0.0018382558669430863
+      }
+    },
+    "safety_gate": {
+      "threshold_miss_km": 0.5,
+      "passed": 1,
+      "used_fallback": 0,
+      "reason": "edge_selected",
+      "no_safe_candidate_in_action_space": 0
+    },
+    "fallback": {
+      "activated": 0,
+      "method": null,
+      "note": "Ground fallback re-evaluates available candidates using deterministic ground-side logic. It does NOT mathematically guarantee safety if no candidate clears the threshold."
+    },
+    "final_decision": {
+      "action_id": 0,
+      "action_name": "NO_MANEUVER",
+      "delta_v_mps": 0.0,
+      "predicted_miss_km": 20.833385689278362,
+      "meets_safety_threshold": 1
+    },
+    "explanation": "Edge selected action 0 (NO_MANEUVER) with confidence 0.986; safety gate PASS.",
+    "latency": {
+      "edge_inference_ms": 1.2144969999781097,
+      "service_total_ms": 1.6161230000193427
+    },
+    "architecture_note": "Ground: SGP4 \u00b7 screening \u00b7 approximate risk \u00b7 fixed candidates \u00b7 scoring. Edge: compact state \u00b7 GBDT ranker \u00b7 safety gate \u00b7 fallback. Simulation / decision support only \u2014 NOT flight software."
+  }
+}
