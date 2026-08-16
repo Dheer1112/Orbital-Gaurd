@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NX-77 — Orbital Command Center</title>
+<meta name="description" content="NX-77 interactive orbital collision avoidance command center.">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
+
+:root{
+  --bg:#010409;
+  --panel:rgba(5,12,20,.78);
+  --panel2:rgba(7,16,26,.91);
+  --line:rgba(126,214,255,.18);
+  --line2:rgba(126,214,255,.32);
+  --cyan:#62ddff;
+  --cyan2:#c8f6ff;
+  --blue:#3c8fff;
+  --red:#ff526a;
+  --amber:#ffbd5b;
+  --green:#55efa0;
+  --text:#edfaff;
+  --muted:#76909f;
+  --mono:"Space Mono",monospace;
+}
+
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg)}
+body{font-family:Inter,system-ui,sans-serif;color:var(--text);cursor:none}
+button,a{font:inherit}
+button{cursor:none}
+a{text-decoration:none;color:inherit}
+
+#space{
+  position:fixed;inset:0;width:100%;height:100%;z-index:0;
+  display:block;
+}
+
+.noise{
+  position:fixed;inset:0;z-index:20;pointer-events:none;opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
+}
+.vignette{
+  position:fixed;inset:0;z-index:19;pointer-events:none;
+  background:radial-gradient(circle at 50% 50%,transparent 35%,rgba(0,0,0,.22) 65%,rgba(0,0,0,.84) 100%);
+}
+.scanlines{
+  position:fixed;inset:0;z-index:19;pointer-events:none;opacity:.06;
+  background:repeating-linear-gradient(to bottom,transparent 0 3px,rgba(150,220,255,.08) 4px);
+}
+
+.cursor,.cursor-ring{
+  position:fixed;z-index:100;pointer-events:none;border-radius:50%;
+  transform:translate(-50%,-50%);
+}
+.cursor{
+  width:5px;height:5px;background:#fff;
+  box-shadow:0 0 16px 5px rgba(98,221,255,.85);
+}
+.cursor-ring{
+  width:30px;height:30px;border:1px solid rgba(98,221,255,.55);
+  transition:width .22s,height .22s,border-color .22s,background .22s;
+}
+.cursor-ring.active{
+  width:54px;height:54px;border-color:rgba(255,255,255,.95);
+  background:rgba(98,221,255,.04);
+}
+
+.boot{
+  position:fixed;inset:0;z-index:200;background:#010409;
+  display:grid;place-items:center;transition:opacity .8s,visibility .8s;
+}
+.boot.hide{opacity:0;visibility:hidden}
+.boot-box{width:min(420px,82vw)}
+.boot-brand{font:700 12px var(--mono);letter-spacing:.35em;color:var(--cyan)}
+.boot-title{margin-top:18px;font-size:25px;font-weight:800;letter-spacing:-.04em}
+.boot-sub{margin-top:8px;color:var(--muted);font:9px var(--mono);letter-spacing:.16em}
+.boot-track{height:2px;background:rgba(120,210,255,.12);margin-top:30px}
+.boot-track b{display:block;height:100%;width:0;background:var(--cyan);box-shadow:0 0 16px var(--cyan)}
+.boot-meta{display:flex;justify-content:space-between;margin-top:9px;color:#5d7888;font:9px var(--mono);letter-spacing:.12em}
+
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:50;height:70px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 28px;
+  background:linear-gradient(180deg,rgba(0,4,8,.78),transparent);
+  pointer-events:none;
+}
+.brand{
+  font:700 12px var(--mono);letter-spacing:.28em;
+}
+.brand span{color:var(--cyan)}
+.top-center{
+  position:absolute;left:50%;transform:translateX(-50%);
+  font:9px var(--mono);letter-spacing:.22em;color:#6e8795;
+}
+.top-live{
+  font:700 9px var(--mono);letter-spacing:.16em;color:var(--green)
+}
+.top-live i{
+  display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--green);box-shadow:0 0 12px var(--green);margin-right:7px;
+}
+
+.side-data{
+  position:fixed;z-index:30;top:94px;width:145px;
+  display:grid;gap:7px;font:8px var(--mono);letter-spacing:.11em;color:#5e7887;
+  pointer-events:none;
+}
+.side-data.left{left:24px}
+.side-data.right{right:24px;text-align:right}
+.side-data strong{color:#d8f5ff;font-size:10px}
+.side-data b{color:var(--cyan);font-weight:700}
+.green{color:var(--green)!important}
+
+.corner{
+  position:fixed;z-index:30;width:36px;height:36px;pointer-events:none;opacity:.6
+}
+.corner.tl{left:20px;top:82px;border-left:1px solid var(--cyan);border-top:1px solid var(--cyan)}
+.corner.tr{right:20px;top:82px;border-right:1px solid var(--cyan);border-top:1px solid var(--cyan)}
+.corner.bl{left:20px;bottom:20px;border-left:1px solid var(--cyan);border-bottom:1px solid var(--cyan)}
+.corner.br{right:20px;bottom:20px;border-right:1px solid var(--cyan);border-bottom:1px solid var(--cyan)}
+
+.launch{
+  position:fixed;z-index:45;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(980px,86vw);text-align:center;
+  transition:opacity .65s,transform .9s,visibility .65s;
+}
+.launch.hidden{opacity:0;visibility:hidden;transform:translate(-50%,-45%) scale(1.03);pointer-events:none}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:11px;
+  color:var(--cyan);font:700 10px var(--mono);letter-spacing:.32em;
+}
+.eyebrow:before,.eyebrow:after{content:"";width:38px;height:1px;background:var(--cyan);box-shadow:0 0 12px rgba(98,221,255,.7)}
+.launch h1{
+  margin:26px 0 20px;font-size:clamp(55px,9vw,132px);line-height:.79;
+  letter-spacing:-.085em;text-transform:uppercase;font-weight:900;
+  text-shadow:0 0 65px rgba(50,190,255,.08);
+}
+.launch h1 .stroke{color:transparent;-webkit-text-stroke:1px rgba(234,250,255,.58)}
+.launch p{
+  max-width:620px;margin:auto;color:#829aa8;font-size:13px;line-height:1.8
+}
+.launch-button{
+  margin-top:35px;padding:17px 26px;min-width:230px;
+  border:1px solid rgba(98,221,255,.55);
+  color:var(--cyan2);background:rgba(98,221,255,.07);
+  font:700 10px var(--mono);letter-spacing:.2em;
+  position:relative;overflow:hidden;transition:.3s;
+}
+.launch-button:before{
+  content:"";position:absolute;inset:0;transform:translateX(-110%);
+  background:linear-gradient(90deg,transparent,rgba(98,221,255,.16),transparent);
+  transition:.5s;
+}
+.launch-button:hover:before{transform:translateX(110%)}
+.launch-button:hover{box-shadow:0 0 35px rgba(98,221,255,.15);border-color:var(--cyan);background:rgba(98,221,255,.11)}
+.launch-note{margin-top:14px;color:#506b79;font:8px var(--mono);letter-spacing:.16em}
+
+.command{
+  position:fixed;inset:0;z-index:40;pointer-events:none;opacity:0;visibility:hidden;
+  transition:opacity .7s,visibility .7s;
+}
+.command.active{opacity:1;visibility:visible}
+.command > *{pointer-events:auto}
+
+.left-panel,.right-panel{
+  position:absolute;top:92px;bottom:72px;width:290px;
+  background:linear-gradient(135deg,rgba(3,10,17,.78),rgba(5,13,22,.52));
+  border:1px solid var(--line);
+  backdrop-filter:blur(18px);
+  box-shadow:0 20px 80px rgba(0,0,0,.28);
+  overflow:hidden;
+}
+.left-panel{left:22px}
+.right-panel{right:22px}
+.left-panel:before,.right-panel:before{
+  content:"";position:absolute;left:0;top:0;width:80px;height:1px;
+  background:var(--cyan);box-shadow:0 0 20px var(--cyan)
+}
+.panel-head{
+  height:49px;padding:0 17px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--line);font:700 9px var(--mono);letter-spacing:.15em;color:#75909f
+}
+.panel-head b{color:var(--cyan)}
+.panel-body{padding:16px}
+
+.nav-tabs{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:14px}
+.tab{
+  border:1px solid var(--line);background:rgba(98,221,255,.025);
+  color:#6f8997;padding:10px 8px;font:700 8px var(--mono);letter-spacing:.11em;
+  transition:.25s;
+}
+.tab:hover,.tab.active{border-color:rgba(98,221,255,.55);color:var(--cyan2);background:rgba(98,221,255,.08)}
+.module{display:none;animation:moduleIn .35s ease both}
+.module.active{display:block}
+@keyframes moduleIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.asset-card{
+  border:1px solid var(--line);padding:15px;background:rgba(98,221,255,.025);
+}
+.kicker{font:8px var(--mono);letter-spacing:.18em;color:#5f7b89}
+.asset-name{font-size:23px;font-weight:800;letter-spacing:-.05em;margin:7px 0 16px}
+.status-pill{
+  display:inline-flex;align-items:center;gap:7px;padding:6px 8px;
+  border:1px solid rgba(85,239,160,.22);color:var(--green);font:700 8px var(--mono)
+}
+.status-pill i{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 9px var(--green)}
+
+.detail-list{display:grid;gap:0;margin-top:15px}
+.detail{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px dashed rgba(126,214,255,.12);font:9px var(--mono)}
+.detail span:first-child{color:#5f7786}.detail span:last-child{color:#dff6ff}
+
+.node-list{display:grid;gap:7px;margin-top:12px}
+.node{
+  width:100%;text-align:left;border:1px solid var(--line);background:rgba(5,14,22,.72);
+  color:#d9f5ff;padding:12px;transition:.25s;position:relative;
+}
+.node:hover,.node.active{border-color:rgba(98,221,255,.6);background:rgba(98,221,255,.08)}
+.node .n-top{display:flex;justify-content:space-between;font:700 8px var(--mono);letter-spacing:.1em}
+.node .n-top b{color:var(--red)}
+.node p{margin:7px 0 0;color:#607b89;font:8px/1.5 var(--mono)}
+
+.risk-card{
+  border:1px solid rgba(255,82,106,.22);padding:17px;
+  background:radial-gradient(circle at 50% 20%,rgba(255,82,106,.08),transparent 65%);
+}
+.risk-label{font:8px var(--mono);letter-spacing:.17em;color:#718795}
+.risk-num{font:800 51px;letter-spacing:-.08em;color:#ff7284;margin:10px 0 4px}
+.risk-state{font:700 8px var(--mono);letter-spacing:.15em;color:#ff9aaa}
+.risk-line{height:3px;background:rgba(255,82,106,.1);margin-top:16px}
+.risk-line b{display:block;width:27%;height:100%;background:var(--red);box-shadow:0 0 12px var(--red)}
+.mini-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:13px}
+.small-btn{
+  border:1px solid var(--line);background:rgba(98,221,255,.04);color:#9bc1cf;
+  padding:10px 6px;font:700 7px var(--mono);letter-spacing:.08em;transition:.2s
+}
+.small-btn:hover{border-color:var(--cyan);color:var(--cyan2)}
+
+.right-risk{
+  border:1px solid rgba(98,221,255,.18);padding:14px;margin-bottom:9px;
+  background:rgba(98,221,255,.025)
+}
+.right-risk .row{display:flex;justify-content:space-between;font:8px var(--mono);padding:7px 0;border-bottom:1px dashed rgba(126,214,255,.1)}
+.right-risk .row:last-child{border-bottom:0}
+.right-risk .row span{color:#607988}.right-risk .row b{color:#e5f9ff}
+.right-risk .row b.cyan{color:var(--cyan)}
+.right-risk .row b.green{color:var(--green)}
+
+.maneuver-card{
+  border:1px solid var(--line);padding:14px;background:rgba(5,14,22,.66);margin-top:9px;
+}
+.maneuver-title{display:flex;justify-content:space-between;font:700 9px var(--mono);color:#dff7ff}
+.maneuver-title b{color:var(--cyan)}
+.slider-row{margin-top:14px}
+.slider-row label{display:flex;justify-content:space-between;font:7px var(--mono);color:#607987;letter-spacing:.1em}
+input[type=range]{width:100%;margin-top:8px;accent-color:var(--cyan)}
+.execute{
+  width:100%;margin-top:12px;padding:13px;border:1px solid rgba(98,221,255,.55);
+  color:var(--cyan2);background:rgba(98,221,255,.08);
+  font:700 8px var(--mono);letter-spacing:.15em;transition:.25s
+}
+.execute:hover{background:rgba(98,221,255,.16);box-shadow:0 0 24px rgba(98,221,255,.12)}
+.execute:disabled{opacity:.45}
+
+.bottom-bar{
+  position:absolute;left:22px;right:22px;bottom:18px;height:39px;
+  border:1px solid var(--line);background:rgba(2,8,14,.72);backdrop-filter:blur(15px);
+  display:flex;align-items:center;justify-content:space-between;padding:0 14px;
+}
+.bottom-bar .read{font:8px var(--mono);letter-spacing:.1em;color:#607b89}
+.bottom-bar .read b{color:var(--cyan)}
+.bottom-controls{display:flex;gap:6px}
+.view-btn{
+  border:1px solid transparent;background:transparent;color:#68828f;padding:6px 8px;
+  font:700 7px var(--mono);letter-spacing:.1em
+}
+.view-btn.active,.view-btn:hover{border-color:var(--line2);color:var(--cyan2)}
+
+.center-ui{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(500px,36vw);min-width:340px;pointer-events:none;text-align:center
+}
+.target-reticle{
+  width:190px;height:190px;border:1px solid rgba(98,221,255,.14);border-radius:50%;
+  margin:auto;position:relative;animation:reticle 8s linear infinite
+}
+.target-reticle:before,.target-reticle:after{content:"";position:absolute;background:rgba(98,221,255,.22)}
+.target-reticle:before{width:1px;height:120%;left:50%;top:-10%}
+.target-reticle:after{height:1px;width:120%;left:-10%;top:50%}
+@keyframes reticle{to{transform:rotate(360deg)}}
+.center-label{
+  margin-top:15px;font:700 8px var(--mono);letter-spacing:.2em;color:#5d7887
+}
+.center-label b{display:block;margin-top:5px;color:var(--cyan);font-size:10px}
+
+.threat-popup{
+  position:absolute;z-index:55;min-width:220px;padding:13px;
+  border:1px solid rgba(255,82,106,.45);background:rgba(3,9,15,.91);
+  backdrop-filter:blur(14px);box-shadow:0 15px 50px rgba(0,0,0,.5);
+  pointer-events:none;opacity:0;transform:translateY(7px);transition:.25s
+}
+.threat-popup.show{opacity:1;transform:none}
+.threat-popup .tp-head{display:flex;justify-content:space-between;font:700 8px var(--mono);color:#ff8798}
+.threat-popup .tp-name{font-size:18px;font-weight:800;margin:9px 0}
+.threat-popup .tp-data{display:grid;grid-template-columns:1fr 1fr;gap:7px;font:8px var(--mono)}
+.threat-popup .tp-data span{color:#5e7785}.threat-popup .tp-data b{display:block;color:#e7f9ff;margin-top:3px}
+
+.launch-fade{
+  position:fixed;inset:0;z-index:100;background:rgba(0,8,14,.72);opacity:0;pointer-events:none;
+  transition:.5s
+}
+.launch-fade.on{opacity:1}
+
+.toast{
+  position:fixed;z-index:80;left:50%;bottom:78px;transform:translate(-50%,20px);
+  padding:10px 14px;border:1px solid var(--line2);background:rgba(3,10,17,.92);
+  color:var(--cyan2);font:700 8px var(--mono);letter-spacing:.12em;
+  opacity:0;transition:.35s;pointer-events:none
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media(max-width:950px){
+  .left-panel,.right-panel{width:250px}
+  .center-ui{width:300px}
+  .top-center,.side-data{display:none}
+}
+@media(max-width:720px){
+  body{cursor:auto}
+  .cursor,.cursor-ring{display:none}
+  .left-panel,.right-panel{top:auto;bottom:64px;height:245px;width:calc(50% - 28px)}
+  .left-panel{left:12px}.right-panel{right:12px}
+  .panel-head{height:39px}
+  .panel-body{padding:10px}
+  .center-ui{width:220px;min-width:0}
+  .target-reticle{width:125px;height:125px}
+  .bottom-bar{left:12px;right:12px}
+  .bottom-bar .read{display:none}
+  .launch h1{font-size:54px}
+  .launch p{font-size:11px}
+}
+
+/* === EXTENDED ORBITAL INTERACTION === */
+.home-info{position:fixed;z-index:44;left:50%;top:calc(50% + 250px);transform:translateX(-50%);width:min(920px,86vw);display:grid;grid-template-columns:1fr 1fr;gap:12px;transition:opacity .55s,transform .65s,visibility .55s}.home-info.hidden{opacity:0;visibility:hidden;transform:translate(-50%,12px);pointer-events:none}.info-card{border:1px solid var(--line);background:rgba(3,10,17,.72);backdrop-filter:blur(14px);padding:14px 16px;text-align:left}.info-card h3{margin:0 0 9px;color:var(--cyan);font:700 9px var(--mono);letter-spacing:.18em}.info-card ul{margin:0;padding-left:16px;color:#91aab7;font:8px/1.8 var(--mono)}.info-card li::marker{color:var(--cyan)}
+.panel-toggle,.home-control{position:absolute;z-index:70;top:92px;padding:9px 12px;border:1px solid var(--line);background:rgba(3,10,17,.78);backdrop-filter:blur(12px);color:#9bc1cf;font:700 8px var(--mono);letter-spacing:.1em;transition:.25s}.panel-toggle{left:50%;transform:translateX(-50%)}.home-control{right:326px}.panel-toggle:hover,.home-control:hover{border-color:var(--cyan);color:var(--cyan2);box-shadow:0 0 20px rgba(98,221,255,.12)}
+.command.panels-hidden .left-panel,.command.panels-hidden .right-panel{opacity:0;visibility:hidden;pointer-events:none;transition:.35s}.command.panels-hidden .left-panel{transform:translateX(-18px)}.command.panels-hidden .right-panel{transform:translateX(18px)}
+.camera-help{position:absolute;z-index:31;left:50%;bottom:72px;transform:translateX(-50%);color:#557280;font:7px var(--mono);letter-spacing:.1em;pointer-events:none}.camera-help b{color:#8fcde0}
+.alert-stack{position:fixed;z-index:120;right:22px;top:78px;width:min(350px,calc(100vw - 44px));display:grid;gap:9px;pointer-events:none}.alert{border:1px solid rgba(255,189,91,.45);background:rgba(15,10,5,.93);box-shadow:0 12px 45px rgba(0,0,0,.45);backdrop-filter:blur(15px);padding:13px 15px;animation:alertIn .35s ease both;pointer-events:auto}.alert.danger{border-color:rgba(255,82,106,.62);background:rgba(17,5,9,.95)}.alert .a-head{display:flex;justify-content:space-between;align-items:center;font:700 8px var(--mono);letter-spacing:.13em;color:var(--amber)}.alert.danger .a-head{color:#ff7a8b}.alert .a-title{font-size:14px;font-weight:800;margin:7px 0 4px}.alert .a-text{color:#78919e;font:8px/1.55 var(--mono)}.alert .a-close{border:0;background:transparent;color:#66818f;font:12px var(--mono);padding:0 0 0 10px}@keyframes alertIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+.orbit-legend{position:absolute;z-index:31;left:50%;top:calc(50% + 205px);transform:translateX(-50%);display:flex;gap:15px;color:#6f8997;font:7px var(--mono);letter-spacing:.09em;pointer-events:none}.orbit-legend i{display:inline-block;width:17px;height:2px;vertical-align:middle;margin-right:5px;background:var(--cyan)}.orbit-legend .debris-line{background:var(--red)}.orbit-legend .debris-dot{width:5px;height:5px;border-radius:50%;background:var(--red)}
+@media(max-width:950px){.home-control{right:18px}.home-info{top:calc(50% + 205px)}}@media(max-width:720px){.home-info{grid-template-columns:1fr;top:calc(50% + 105px);max-height:150px;overflow:auto}.panel-toggle{top:74px}.home-control{top:74px;right:12px}.alert-stack{top:120px}.orbit-legend{display:none}.camera-help{display:none}}
+</style>
+</head>
+
+<body>
+<canvas id="space"></canvas>
+<div class="noise"></div><div class="vignette"></div><div class="scanlines"></div>
+<div class="cursor"></div><div class="cursor-ring"></div>
+
+<div class="boot" id="boot">
+  <div class="boot-box">
+    <div class="boot-brand">NX—77 / NICOTECH</div>
+    <div class="boot-title">ORBITAL DEFENSE SYSTEM</div>
+    <div class="boot-sub" id="bootText">INITIALIZING SENSOR ARRAY</div>
+    <div class="boot-track"><b id="bootBar"></b></div>
+    <div class="boot-meta"><span id="bootMeta">LOADING VISUAL CORE</span><span id="bootPct">00%</span></div>
+  </div>
+</div>
+
+<div class="launch-fade" id="launchFade"></div>
+<div class="toast" id="toast">TELEMETRY UPDATED</div><div class="alert-stack" id="alertStack"></div>
+
+<header class="topbar">
+  <div class="brand">NX<span>—</span>77 / ORBITAL SAFETY</div>
+  <div class="top-center">NICOTECH // MISSION CONTROL</div>
+  <div class="top-live"><i></i>ORBITAL ENVIRONMENT ONLINE</div>
+</header>
+
+<div class="side-data left">
+  <strong>GROUND STATION</strong>
+  <span>LAT <b>26.8467° N</b></span>
+  <span>LON <b>75.8051° E</b></span>
+  <span>LINK <b>ENCRYPTED</b></span>
+  <span>UPTIME <b id="uptime">00:00:00</b></span>
+</div>
+
+<div class="side-data right">
+  <strong>TELEMETRY</strong>
+  <span>UTC <b id="utc">--:--:--</b></span>
+  <span>FPS <b id="fps">60</b></span>
+  <span>TRACKS <b>12,481</b></span>
+  <span>SYS <b class="green">NOMINAL</b></span>
+</div>
+
+<div class="corner tl"></div><div class="corner tr"></div>
+<div class="corner bl"></div><div class="corner br"></div>
+
+<!-- Opening screen -->
+<section class="launch" id="launch">
+  <div class="eyebrow">AUTONOMOUS ORBITAL SAFETY SYSTEM</div>
+  <h1>NICOTECH-X<br><span class="stroke">SPACE DEBRIS</span><br>COLLISION<br><span class="stroke">AVOIDANCE SYSTEM</span></h1>
+  <p>Built with love by Team Nicotech</p>
+  <button class="launch-button" id="launchButton">ENTER CONTROL PANEL →</button>
+  <div class="launch-note">DRAG TO ROTATE / WHEEL TO ZOOM / INTERACTIVE MISSION INTERFACE</div>
+</section>
+<!-- Interactive command center -->
+<section class="command" id="command">
+  <button class="panel-toggle" id="panelToggle">HIDE CONTROL PANEL</button>
+  <button class="home-control" id="homeControl">⌂ HOME</button>
+  <div class="camera-help">DRAG <b>ROTATE</b> · WHEEL <b>ZOOM</b> · DOUBLE CLICK <b>RESET VIEW</b></div>
+  <div class="orbit-legend"><span><i></i>SATELLITE ORBIT</span><span><i class="debris-line"></i>DEBRIS TRAJECTORY</span><span><i class="debris-dot"></i>TRACKED OBJECT</span></div>
+
+
+  <aside class="left-panel">
+    <div class="panel-head"><span>MISSION CONSOLE</span><b id="selectedHeader">NX-77</b></div>
+    <div class="panel-body">
+
+      <div class="nav-tabs">
+        <button class="tab active" data-tab="overview">OVERVIEW</button>
+        <button class="tab" data-tab="threats">THREATS</button>
+        <button class="tab" data-tab="satellite">SATELLITE</button>
+        <button class="tab" data-tab="system">SYSTEM</button>
+      </div>
+
+      <div class="module active" id="tab-overview">
+        <div class="asset-card">
+          <div class="kicker">PROTECTED ASSET</div>
+          <div class="asset-name">NX-77</div>
+          <div class="status-pill"><i></i>OPERATIONAL</div>
+          <div class="detail-list">
+            <div class="detail"><span>ALTITUDE</span><span>548 KM</span></div>
+            <div class="detail"><span>VELOCITY</span><span>7.59 KM/S</span></div>
+            <div class="detail"><span>INCLINATION</span><span>51.6°</span></div>
+            <div class="detail"><span>FUEL RESERVE</span><span>72%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="module" id="tab-threats">
+        <div class="kicker">ACTIVE CONJUNCTIONS</div>
+        <div class="node-list">
+          <button class="node active" data-node="debris-48291">
+            <div class="n-top"><span>DEBRIS-48291</span><b>HIGH</b></div>
+            <p>MISS 0.84 KM / RELATIVE 3.20 KM/S</p>
+          </button>
+          <button class="node" data-node="debris-39108">
+            <div class="n-top"><span>DEBRIS-39108</span><b style="color:var(--amber)">MED</b></div>
+            <p>MISS 4.18 KM / RELATIVE 1.91 KM/S</p>
+          </button>
+          <button class="node" data-node="debris-77120">
+            <div class="n-top"><span>DEBRIS-77120</span><b style="color:var(--green)">LOW</b></div>
+            <p>MISS 18.40 KM / RELATIVE 0.71 KM/S</p>
+          </button>
+          <button class="node" data-node="debris-62014">
+            <div class="n-top"><span>DEBRIS-62014</span><b style="color:var(--amber)">MED</b></div>
+            <p>MISS 7.62 KM / RELATIVE 2.14 KM/S</p>
+          </button>
+          <button class="node" data-node="debris-88403">
+            <div class="n-top"><span>DEBRIS-88403</span><b style="color:var(--green)">LOW</b></div>
+            <p>MISS 24.90 KM / RELATIVE 0.58 KM/S</p>
+          </button>
+        </div>
+      </div>
+
+      <div class="module" id="tab-satellite">
+        <div class="asset-card">
+          <div class="kicker">ORBITAL PROFILE</div>
+          <div class="asset-name">NX-77</div>
+          <div class="detail-list">
+            <div class="detail"><span>ORBIT TYPE</span><span>LEO</span></div>
+            <div class="detail"><span>PERIGEE</span><span>542 KM</span></div>
+            <div class="detail"><span>APOGEE</span><span>554 KM</span></div>
+            <div class="detail"><span>PERIOD</span><span>95.6 MIN</span></div>
+            <div class="detail"><span>STATUS</span><span class="green">NOMINAL</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="module" id="tab-system">
+        <div class="asset-card">
+          <div class="kicker">PROCESSING CORE</div>
+          <div class="detail-list">
+            <div class="detail"><span>PROPAGATOR</span><span>SGP4 / SDP4</span></div>
+            <div class="detail"><span>SCREENING</span><span class="green">ACTIVE</span></div>
+            <div class="detail"><span>DATA SOURCE</span><span>PUBLIC GP DATA</span></div>
+            <div class="detail"><span>ENGINE</span><span>DECISION SUPPORT</span></div>
+            <div class="detail"><span>MODE</span><span class="cyan">SIMULATION</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+  <aside class="right-panel">
+    <div class="panel-head"><span>THREAT RESPONSE</span><b id="responseState">ANALYSIS</b></div>
+    <div class="panel-body">
+      <div class="risk-card">
+        <div class="risk-label">EST. COLLISION PROBABILITY</div>
+        <div class="risk-num" id="riskNum">2.70%</div>
+        <div class="risk-state" id="riskState">ELEVATED / ACTION RECOMMENDED</div>
+        <div class="risk-line"><b id="riskFill"></b></div>
+      </div>
+
+      <div class="right-risk">
+        <div class="row"><span>MISS DISTANCE</span><b id="miss">0.84 KM</b></div>
+        <div class="row"><span>TIME TO CLOSE APPROACH</span><b>02:41:18</b></div>
+        <div class="row"><span>RELATIVE VELOCITY</span><b>3.20 KM/S</b></div>
+        <div class="row"><span>MISSION IMPACT</span><b id="impact">UNRESOLVED</b></div>
+      </div>
+
+      <div class="kicker">MANEUVER OPTIMIZER</div>
+      <div class="maneuver-card">
+        <div class="maneuver-title"><span id="manName">MANEUVER A</span><b id="dv">0.42 M/S</b></div>
+        <div class="slider-row">
+          <label><span>ΔV MAGNITUDE</span><span id="dvSliderLabel">0.42 M/S</span></label>
+          <input id="dvSlider" type="range" min="0.20" max="1.20" step="0.01" value="0.42">
+        </div>
+        <div class="mini-actions">
+          <button class="small-btn" data-maneuver="A">A / LOW ΔV</button>
+          <button class="small-btn" data-maneuver="B">B / MAX SAFETY</button>
+          <button class="small-btn" data-maneuver="C">C / CLEARANCE</button>
+          <button class="small-btn" id="resetBtn">RESET</button>
+        </div>
+        <button class="execute" id="executeBtn">SIMULATE MANEUVER →</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="center-ui">
+    <div class="target-reticle"></div>
+    <div class="center-label">EARTH / LOW EARTH ORBIT <b id="centerState">TRACKING 12,481 OBJECTS</b></div>
+  </div>
+
+  <div class="threat-popup" id="threatPopup">
+    <div class="tp-head"><span>CONJUNCTION TARGET</span><span id="tpLevel">HIGH</span></div>
+    <div class="tp-name" id="tpName">DEBRIS-48291</div>
+    <div class="tp-data">
+      <div><span>MISS</span><b id="tpMiss">0.84 KM</b></div>
+      <div><span>RELATIVE</span><b id="tpRel">3.20 KM/S</b></div>
+      <div><span>RISK</span><b id="tpRisk">2.70%</b></div>
+      <div><span>STATUS</span><b>SCREENING</b></div>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="read">VIEW / <b id="viewRead">GLOBAL ORBIT</b> &nbsp; // &nbsp; EARTH CENTERED FRAME</div>
+    <div class="bottom-controls">
+      <button class="view-btn active" data-view="global">GLOBAL</button>
+      <button class="view-btn" data-view="asset">ASSET</button>
+      <button class="view-btn" data-view="threat">THREAT</button>
+      <button class="view-btn" id="pauseBtn">Ⅱ PAUSE</button>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+(() => {
+  const canvas = document.getElementById('space');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:false});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.15;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x010409);
+
+  const camera = new THREE.PerspectiveCamera(43,innerWidth/innerHeight,.1,1000);
+  camera.position.set(0,0,9.5);
+
+  const root = new THREE.Group();
+  scene.add(root);
+
+  // Stars
+  const starCount = 5200;
+  const starPositions = new Float32Array(starCount*3);
+  for(let i=0;i<starCount;i++){
+    const r = 22 + Math.random()*45;
+    const theta = Math.random()*Math.PI*2;
+    const phi = Math.acos(2*Math.random()-1);
+    starPositions[i*3] = r*Math.sin(phi)*Math.cos(theta);
+    starPositions[i*3+1] = r*Math.cos(phi);
+    starPositions[i*3+2] = r*Math.sin(phi)*Math.sin(theta);
+  }
+  const starGeo = new THREE.BufferGeometry();
+  starGeo.setAttribute('position',new THREE.BufferAttribute(starPositions,3));
+  const starMat = new THREE.PointsMaterial({
+    color:0xbfeeff,size:.045,transparent:true,opacity:.82,sizeAttenuation:true
+  });
+  const stars = new THREE.Points(starGeo,starMat);
+  scene.add(stars);
+
+  // Earth group
+  const earthGroup = new THREE.Group();
+  root.add(earthGroup);
+  earthGroup.position.set(0,0,-.6);
+
+  const textureLoader = new THREE.TextureLoader();
+  textureLoader.setCrossOrigin('anonymous');
+
+  const earthTexture = textureLoader.load(
+    'https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg'
+  );
+  const earthNormal = textureLoader.load(
+    'https://threejs.org/examples/textures/planets/earth_normal_2048.jpg'
+  );
+  const earthSpec = textureLoader.load(
+    'https://threejs.org/examples/textures/planets/earth_specular_2048.jpg'
+  );
+  const cloudTexture = textureLoader.load(
+    'https://threejs.org/examples/textures/planets/earth_clouds_1024.png'
+  );
+
+  const earth = new THREE.Mesh(
+    new THREE.SphereGeometry(2.55,96,96),
+    new THREE.MeshPhongMaterial({
+      map:earthTexture,
+      normalMap:earthNormal,
+      specularMap:earthSpec,
+      specular:new THREE.Color(0x315f73),
+      shininess:22
+    })
+  );
+  earthGroup.add(earth);
+
+  const clouds = new THREE.Mesh(
+    new THREE.SphereGeometry(2.585,96,96),
+    new THREE.MeshPhongMaterial({
+      map:cloudTexture,transparent:true,opacity:.42,depthWrite:false
+    })
+  );
+  earthGroup.add(clouds);
+
+  // Atmosphere shell
+  const atmosphere = new THREE.Mesh(
+    new THREE.SphereGeometry(2.67,64,64),
+    new THREE.MeshBasicMaterial({
+      color:0x4ecfff,transparent:true,opacity:.105,side:THREE.BackSide
+    })
+  );
+  earthGroup.add(atmosphere);
+
+  const sun = new THREE.DirectionalLight(0xd7f5ff,2.8);
+  sun.position.set(5,3,7);
+  scene.add(sun);
+  scene.add(new THREE.AmbientLight(0x153449,1.15));
+
+  // Orbital rings
+  const orbitGroup = new THREE.Group();
+  root.add(orbitGroup);
+  const orbitMaterials = [
+    new THREE.MeshBasicMaterial({color:0x56dfff,transparent:true,opacity:.22}),
+    new THREE.MeshBasicMaterial({color:0x3b8fff,transparent:true,opacity:.12}),
+    new THREE.MeshBasicMaterial({color:0xff536a,transparent:true,opacity:.16})
+  ];
+  const orbitRadii = [3.45,4.05,4.75];
+  orbitRadii.forEach((r,i)=>{
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(r,.008,8,220),orbitMaterials[i]);
+    ring.rotation.x = Math.PI/2 + (i*.16);
+    ring.rotation.z = i*.42;
+    orbitGroup.add(ring);
+  });
+
+  // Satellite model — intentionally stylized but clearly readable
+  const satGroup = new THREE.Group();
+  root.add(satGroup);
+  const satBody = new THREE.Mesh(
+    new THREE.BoxGeometry(.19,.12,.12),
+    new THREE.MeshStandardMaterial({color:0xd9e6ea,metalness:.8,roughness:.24})
+  );
+  satGroup.add(satBody);
+  const panelMat = new THREE.MeshStandardMaterial({color:0x12334a,metalness:.4,roughness:.38});
+  [-1,1].forEach(side=>{
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(.44,.018,.18),panelMat);
+    panel.position.x = side*.31;
+    satGroup.add(panel);
+  });
+  satGroup.position.set(-3.05,.35,.3);
+  satGroup.scale.setScalar(1.4);
+  const satOrbitMat=new THREE.LineBasicMaterial({color:0x62ddff,transparent:true,opacity:.58});
+  const satOrbitPts=[]; for(let i=0;i<=180;i++){const a=i/180*Math.PI*2;satOrbitPts.push(new THREE.Vector3(Math.cos(a)*3.55,.42*Math.sin(a),Math.sin(a)*3.55));}
+  const satOrbit=new THREE.Line(new THREE.BufferGeometry().setFromPoints(satOrbitPts),satOrbitMat); root.add(satOrbit);
+  const debrisTrajectories={};
+  [['debris-48291',3.72,.24,0xff526a,.75],['debris-39108',4.18,-.45,0xffbd5b,.52],['debris-77120',4.55,.72,0x55efa0,.38]].forEach(([id,r,y,color,opacity])=>{const pts=[];for(let i=0;i<=140;i++){const a=i/140*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*r,y+.12*Math.sin(a*2.1),Math.sin(a)*r));}const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color,transparent:true,opacity}));root.add(line);debrisTrajectories[id]=line;});
+
+
+  // Threat objects
+  const threatData = {
+    'debris-48291':{name:'DEBRIS-48291',risk:2.70,miss:.84,rel:3.20,level:'HIGH',color:0xff526a},
+    'debris-39108':{name:'DEBRIS-39108',risk:.64,miss:4.18,rel:1.91,level:'MED',color:0xffbd5b},
+    'debris-77120':{name:'DEBRIS-77120',risk:.08,miss:18.40,rel:.71,level:'LOW',color:0x55efa0},
+    'debris-62014':{name:'DEBRIS-62014',risk:.42,miss:7.62,rel:2.14,level:'MED',color:0xffbd5b},
+    'debris-88403':{name:'DEBRIS-88403',risk:.03,miss:24.90,rel:.58,level:'LOW',color:0x55efa0}
+  };
+
+  const threatObjects = {};
+  Object.entries(threatData).forEach(([id,d],i)=>{
+    const g = new THREE.Group();
+    const core = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(.085,0),
+      new THREE.MeshStandardMaterial({color:d.color,roughness:.7,metalness:.15,emissive:d.color,emissiveIntensity:.35})
+    );
+    g.add(core);
+    const halo = new THREE.Mesh(
+      new THREE.SphereGeometry(.18,16,16),
+      new THREE.MeshBasicMaterial({color:d.color,transparent:true,opacity:.06,side:THREE.BackSide})
+    );
+    g.add(halo);
+    g.userData = {id};
+    threatObjects[id] = g;
+    root.add(g);
+  });
+
+  // Debris field: hundreds of tiny physical objects
+  const debrisCount = 480;
+  const debrisPos = new Float32Array(debrisCount*3);
+  const debrisColors = new Float32Array(debrisCount*3);
+  const c1 = new THREE.Color(0x7bcfe9);
+  const c2 = new THREE.Color(0xff6b78);
+  for(let i=0;i<debrisCount;i++){
+    const a=Math.random()*Math.PI*2;
+    const r=3.25+Math.random()*2.15;
+    const y=(Math.random()-.5)*1.15;
+    debrisPos[i*3]=Math.cos(a)*r;
+    debrisPos[i*3+1]=y;
+    debrisPos[i*3+2]=Math.sin(a)*r;
+    const c=Math.random()>.87?c2:c1;
+    debrisColors[i*3]=c.r;debrisColors[i*3+1]=c.g;debrisColors[i*3+2]=c.b;
+  }
+  const debrisGeo = new THREE.BufferGeometry();
+  debrisGeo.setAttribute('position',new THREE.BufferAttribute(debrisPos,3));
+  debrisGeo.setAttribute('color',new THREE.BufferAttribute(debrisColors,3));
+  const debrisMat = new THREE.PointsMaterial({size:.035,vertexColors:true,transparent:true,opacity:.68});
+  const debrisField = new THREE.Points(debrisGeo,debrisMat);
+  root.add(debrisField);
+
+  // Conjunction path
+  const pathMat = new THREE.LineBasicMaterial({color:0xff536a,transparent:true,opacity:.28});
+  const pathPts=[];
+  for(let i=0;i<=80;i++){
+    const t=i/80*Math.PI*2;
+    pathPts.push(new THREE.Vector3(
+      Math.cos(t)*3.75,
+      .24*Math.sin(t*2),
+      Math.sin(t)*3.75
+    ));
+  }
+  const path = new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints(pathPts),pathMat
+  );
+  root.add(path);
+
+  // Mouse parallax
+  let mouseX=0,mouseY=0,targetX=0,targetY=0;
+  window.addEventListener('mousemove',e=>{
+    targetX=(e.clientX/innerWidth-.5);
+    targetY=(e.clientY/innerHeight-.5);
+    document.querySelector('.cursor').style.left=e.clientX+'px';
+    document.querySelector('.cursor').style.top=e.clientY+'px';
+    document.querySelector('.cursor-ring').style.left=e.clientX+'px';
+    document.querySelector('.cursor-ring').style.top=e.clientY+'px';
+  });
+
+  const interactives=document.querySelectorAll('button,a,input');
+  interactives.forEach(el=>{
+    el.addEventListener('mouseenter',()=>document.querySelector('.cursor-ring').classList.add('active'));
+    el.addEventListener('mouseleave',()=>document.querySelector('.cursor-ring').classList.remove('active'));
+  });
+
+  let paused=false;
+  let selectedId='debris-48291';
+  let safe=false;
+  let cameraMode='global';
+  let startTime=Date.now();
+  let panelsHidden=false,dragging=false,lastPointerX=0,lastPointerY=0;
+  let userRotX=0,userRotY=0,targetRotX=0,targetRotY=0,targetZoom=9.5;
+  let spectateActive=false, spectateTarget=null, satelliteSpectate=false;
+
+  function enterSpectate(id){
+    spectateActive=true;
+    satelliteSpectate=false;
+    spectateTarget=id;
+    cameraMode='spectate';
+    targetZoom=7.2;
+    showToast('SPECTATING '+threatData[id].name+' / FOLLOWING ORBIT');
+    pushAlert(
+      'TRACK LOCK: '+threatData[id].name,
+      'Freecam is following this debris trajectory. Double-click or scroll out to exit spectate mode.',
+      threatData[id].level==='HIGH'?'danger':'warning',
+      4200
+    );
+  }
+
+  function enterSatelliteSpectate(){
+    satelliteSpectate=true;
+    spectateActive=false;
+    spectateTarget=null;
+    cameraMode='satellite-spectate';
+    targetZoom=7.0;
+    showToast('SPECTATING NX-77 / FOLLOWING ORBIT');
+    pushAlert(
+      'SATELLITE TRACK LOCK',
+      'Freecam is following NX-77 along its LEO trajectory. Double-click or scroll out to exit spectate mode.',
+      'warning',
+      4200
+    );
+  }
+
+  function exitSpectate(){
+    spectateActive=false;
+    satelliteSpectate=false;
+    spectateTarget=null;
+    cameraMode='global';
+    targetZoom=9.5;
+    showToast('SPECTATE MODE EXITED / FREECAM RESTORED');
+  }
+
+  canvas.style.cursor='grab';
+  canvas.addEventListener('pointerdown',e=>{if(!command.classList.contains('active'))return;dragging=true;canvas.setPointerCapture(e.pointerId);lastPointerX=e.clientX;lastPointerY=e.clientY;canvas.style.cursor='grabbing';});
+  canvas.addEventListener('pointermove',e=>{if(!dragging||!command.classList.contains('active'))return;const dx=e.clientX-lastPointerX,dy=e.clientY-lastPointerY;targetRotY+=dx*.006;targetRotX+=dy*.006;targetRotX=Math.max(-1.45,Math.min(1.45,targetRotX));lastPointerX=e.clientX;lastPointerY=e.clientY;});
+  canvas.addEventListener('pointerup',()=>{dragging=false;canvas.style.cursor='grab';});
+  canvas.addEventListener('pointercancel',()=>{dragging=false;canvas.style.cursor='grab';});
+  canvas.addEventListener('wheel',e=>{
+    if(!command.classList.contains('active'))return;
+    e.preventDefault();
+    if((spectateActive||satelliteSpectate) && e.deltaY>0){
+      exitSpectate();
+      return;
+    }
+    targetZoom=Math.max(5.2,Math.min(18,targetZoom+e.deltaY*.006));
+  },{passive:false});
+  canvas.addEventListener('dblclick',()=>{
+    if(spectateActive||satelliteSpectate){
+      exitSpectate();
+      return;
+    }
+    targetRotX=0;targetRotY=0;targetZoom=9.5;cameraMode='global';
+    showToast('VIEW RESET / EARTH CENTERED FRAME');
+  });
+  function resetFreeView(){targetRotX=0;targetRotY=0;targetZoom=9.5;cameraMode='global';}
+
+
+  function placeThreats(t){
+    const configs = [
+      ['debris-48291',3.72,.24,1.0],
+      ['debris-39108',4.18,-.45,.72],
+      ['debris-77120',4.55,.72,.48],
+      ['debris-62014',4.85,-.70,.64],
+      ['debris-88403',5.15,.52,.42]
+    ];
+    configs.forEach(([id,r,y,s],i)=>{
+      const g=threatObjects[id];
+      const a=t*(.00017*(i+1)) + i*2.2;
+      g.position.set(Math.cos(a)*r,y+Math.sin(t*.0007+i)*.08,Math.sin(a)*r);
+      g.rotation.x=t*.0004;
+      g.rotation.y=t*.00055;
+    });
+    if(safe){
+      const g=threatObjects['debris-48291'];
+      g.position.x += 1.05;
+      g.position.y += .55;
+    }
+  }
+
+  function render(t){
+    requestAnimationFrame(render);
+    if(!paused){
+      earth.rotation.y += .00055;
+      clouds.rotation.y += .00072;
+      orbitGroup.rotation.y -= .00024;
+      debrisField.rotation.y += .00012;
+      stars.rotation.y += .000018;
+      placeThreats(t);
+      const satA=t*.00018; satGroup.position.set(Math.cos(satA)*3.55,.42*Math.sin(satA),Math.sin(satA)*3.55); satGroup.rotation.y += .001;
+    }
+
+    mouseX += (targetX-mouseX)*.035;
+    mouseY += (targetY-mouseY)*.035;
+
+    userRotX += (targetRotX-userRotX)*.08; userRotY += (targetRotY-userRotY)*.08;
+    root.rotation.x=userRotX-mouseY*.02; root.rotation.y=userRotY+mouseX*.025;
+    if(satelliteSpectate){
+      const worldPos=new THREE.Vector3();
+      satGroup.getWorldPosition(worldPos);
+      const desiredPos=worldPos.clone().add(new THREE.Vector3(0,1.0,2.7));
+      camera.position.lerp(desiredPos,.075);
+      camera.lookAt(worldPos);
+    }else if(spectateActive && spectateTarget && threatObjects[spectateTarget]){
+      const worldPos=new THREE.Vector3();
+      threatObjects[spectateTarget].getWorldPosition(worldPos);
+      const desiredPos=worldPos.clone().add(new THREE.Vector3(0,1.15,3.0));
+      camera.position.lerp(desiredPos,.075);
+      camera.lookAt(worldPos);
+    }else{
+      let desiredZ=targetZoom;
+      if(cameraMode==='asset')desiredZ=Math.min(targetZoom,7.8);
+      if(cameraMode==='threat')desiredZ=Math.min(targetZoom,6.9);
+      camera.position.z += (desiredZ-camera.position.z)*.055;
+      camera.position.x += (mouseX*.45-camera.position.x)*.025;
+      camera.position.y += (-mouseY*.3-camera.position.y)*.025;
+      camera.lookAt(0,0,0);
+    }
+
+    renderer.render(scene,camera);
+  }
+  requestAnimationFrame(render);
+
+  window.addEventListener('resize',()=>{
+    renderer.setSize(innerWidth,innerHeight);
+    camera.aspect=innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+  });
+
+  // Boot
+  const boot=document.getElementById('boot');
+  const bootBar=document.getElementById('bootBar');
+  const bootPct=document.getElementById('bootPct');
+  const bootText=document.getElementById('bootText');
+  const bootMeta=document.getElementById('bootMeta');
+  const bootMessages=[
+    ['INITIALIZING SENSOR ARRAY','LOADING VISUAL CORE'],
+    ['LOCKING EARTH REFERENCE FRAME','LOADING ORBITAL FIELD'],
+    ['CALIBRATING CONJUNCTION SCREEN','SYNCING TELEMETRY'],
+    ['COMMAND CORE ONLINE','SYSTEM NOMINAL']
+  ];
+  let bootStep=0;
+  const bootTimer=setInterval(()=>{
+    bootStep++;
+    const pct=Math.min(100,bootStep*25);
+    bootBar.style.width=pct+'%';bootPct.textContent=String(pct).padStart(2,'0')+'%';
+    const msg=bootMessages[Math.min(3,bootStep)];
+    bootText.textContent=msg[0];bootMeta.textContent=msg[1];
+    if(pct===100){
+      clearInterval(bootTimer);
+      setTimeout(()=>boot.classList.add('hide'),350);
+    }
+  },330);
+
+  // Launch
+  const launch=document.getElementById('launch');
+  const command=document.getElementById('command');
+  const panelToggle=document.getElementById('panelToggle');
+  const homeControl=document.getElementById('homeControl');
+  const alertStack=document.getElementById('alertStack');
+  let firstAlert=true;
+  function pushAlert(title,text,level='warning',duration=5200){const box=document.createElement('div');box.className='alert '+(level==='danger'?'danger':'');box.innerHTML=`<div class="a-head"><span>${level==='danger'?'⚠ DANGER WARNING':'⚠ SYSTEM WARNING'}</span><button class="a-close">×</button></div><div class="a-title">${title}</div><div class="a-text">${text}</div>`;box.querySelector('.a-close').onclick=()=>box.remove();alertStack.appendChild(box);setTimeout(()=>box.remove(),duration);}
+  panelToggle.addEventListener('click',()=>{panelsHidden=!panelsHidden;command.classList.toggle('panels-hidden',panelsHidden);panelToggle.textContent=panelsHidden?'SHOW CONTROL PANEL':'HIDE CONTROL PANEL';showToast(panelsHidden?'CONTROL PANEL HIDDEN / FREE VIEW':'CONTROL PANEL RESTORED');});
+  homeControl.addEventListener('click',()=>{command.classList.remove('active','panels-hidden');launch.classList.remove('hidden');homeInfo.classList.remove('hidden');panelToggle.textContent='HIDE CONTROL PANEL';resetFreeView();showToast('RETURNED TO MISSION HOME');});
+  const launchFade=document.getElementById('launchFade');
+  document.getElementById('launchButton').addEventListener('click',()=>{
+    launchFade.classList.add('on');
+    setTimeout(()=>{
+      launch.classList.add('hidden');
+      command.classList.add('active');
+      resetFreeView();
+      launchFade.classList.remove('on');
+      showToast('ORBITAL COMMAND CENTER ONLINE');
+      if(firstAlert){firstAlert=false;setTimeout(()=>pushAlert('CONJUNCTION SCREENING ACTIVE','High-priority debris track detected near NX-77. Review the recommended maneuver before execution.','danger'),700);}
+    },500);
+  });
+
+  // Tabs
+  document.querySelectorAll('.tab').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.module').forEach(x=>x.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // Threat nodes
+  const popup=document.getElementById('threatPopup');
+  function selectThreat(id){
+    selectedId=id;
+    const d=threatData[id];
+    document.querySelectorAll('.node').forEach(n=>n.classList.toggle('active',n.dataset.node===id));
+    document.getElementById('selectedHeader').textContent=d.name;
+    document.getElementById('riskNum').textContent=d.risk.toFixed(d.risk<1?2:2)+'%';
+    document.getElementById('riskState').textContent=d.level==='HIGH'?'ELEVATED / ACTION RECOMMENDED':d.level==='MED'?'MONITOR / REVIEW':'LOW / NOMINAL';
+    document.getElementById('riskFill').style.width=Math.min(d.risk*10,100)+'%';
+    document.getElementById('miss').textContent=d.miss.toFixed(2)+' KM';
+    document.getElementById('impact').textContent=d.level==='HIGH'?'UNRESOLVED':d.level==='MED'?'MONITORING':'NOMINAL';
+    document.getElementById('tpName').textContent=d.name;
+    document.getElementById('tpLevel').textContent=d.level;
+    document.getElementById('tpMiss').textContent=d.miss.toFixed(2)+' KM';
+    document.getElementById('tpRel').textContent=d.rel.toFixed(2)+' KM/S';
+    document.getElementById('tpRisk').textContent=d.risk.toFixed(2)+'%';
+    popup.style.left='50%';popup.style.top='calc(50% + 145px)';
+    popup.classList.add('show');
+    enterSpectate(id);
+    showToast(d.name+' SELECTED / TRACK LOCK');
+    if(d.level==='HIGH')pushAlert('DANGER: HIGH-RISK CONJUNCTION',`${d.name} is inside the critical screening threshold. Estimated collision probability: ${d.risk.toFixed(2)}%.`,'danger');
+    else if(d.level==='MED')pushAlert('WARNING: CONJUNCTION REVIEW',`${d.name} requires continued tracking. Current miss distance: ${d.miss.toFixed(2)} km.`);
+    setTimeout(()=>popup.classList.remove('show'),2800);
+  }
+  document.querySelectorAll('.node').forEach(n=>n.addEventListener('click',()=>selectThreat(n.dataset.node)));
+
+  // Click 3D threat markers with raycasting
+  const raycaster=new THREE.Raycaster();
+  const pointer=new THREE.Vector2();
+  window.addEventListener('click',e=>{
+    if(!command.classList.contains('active')) return;
+    pointer.x=(e.clientX/innerWidth)*2-1;
+    pointer.y=-(e.clientY/innerHeight)*2+1;
+    raycaster.setFromCamera(pointer,camera);
+
+    // Satellite click -> follow NX-77 orbit
+    const satMeshes=[];
+    satGroup.traverse(o=>{if(o.isMesh) satMeshes.push(o)});
+    const satHit=raycaster.intersectObjects(satMeshes,false)[0];
+    if(satHit){
+      enterSatelliteSpectate();
+      return;
+    }
+
+    const meshes=[];
+    Object.values(threatObjects).forEach(g=>g.traverse(o=>{if(o.isMesh) meshes.push(o)}));
+    const hit=raycaster.intersectObjects(meshes,false)[0];
+    if(hit){
+      let g=hit.object;
+      while(g && !g.userData.id) g=g.parent;
+      if(g && g.userData.id){
+        selectThreat(g.userData.id);
+      }
+    }
+  });
+
+  // Maneuver controls
+  const maneuverData={
+    A:{dv:.42,risk:.02,miss:4.62,name:'MANEUVER A'},
+    B:{dv:.71,risk:.01,miss:6.18,name:'MANEUVER B'},
+    C:{dv:1.04,risk:.008,miss:7.43,name:'MANEUVER C'}
+  };
+  let selectedM='A';
+
+  function setManeuver(key){
+    selectedM=key;
+    const d=maneuverData[key];
+    safe=false;
+    document.getElementById('manName').textContent=d.name;
+    document.getElementById('dv').textContent=d.dv.toFixed(2)+' M/S';
+    document.getElementById('dvSlider').value=d.dv;
+    document.getElementById('dvSliderLabel').textContent=d.dv.toFixed(2)+' M/S';
+    document.getElementById('responseState').textContent='ANALYSIS';
+    document.getElementById('centerState').textContent='CANDIDATE '+key+' / READY TO SIMULATE';
+    document.getElementById('executeBtn').textContent='SIMULATE MANEUVER →';
+    document.getElementById('executeBtn').disabled=false;
+  }
+  document.querySelectorAll('[data-maneuver]').forEach(b=>b.addEventListener('click',()=>setManeuver(b.dataset.maneuver)));
+
+  document.getElementById('dvSlider').addEventListener('input',e=>{
+    const v=parseFloat(e.target.value);
+    document.getElementById('dv').textContent=v.toFixed(2)+' M/S';
+    document.getElementById('dvSliderLabel').textContent=v.toFixed(2)+' M/S';
+  });
+
+  document.getElementById('executeBtn').addEventListener('click',()=>{
+    const d=maneuverData[selectedM];
+    safe=true;
+    document.getElementById('responseState').textContent='EXECUTING';
+    document.getElementById('centerState').textContent='MANEUVER BURN / PROPAGATING';
+    document.getElementById('executeBtn').disabled=true;
+    document.getElementById('executeBtn').textContent='PROPAGATING TRAJECTORY…';
+
+    animateNumber('riskNum',2.70,d.risk,1200,v=>v.toFixed(3)+'%');
+    setTimeout(()=>{
+      document.getElementById('miss').textContent=d.miss.toFixed(2)+' KM';
+      document.getElementById('impact').textContent='PRESERVED';
+      document.getElementById('impact').className='green';
+      document.getElementById('riskState').textContent='SAFE / MANEUVER VERIFIED';
+      document.getElementById('riskFill').style.width=Math.max(1,d.risk*10)+'%';
+      document.getElementById('responseState').textContent='VERIFIED';
+      document.getElementById('centerState').textContent='POST-MANEUVER / SAFE TRAJECTORY';
+      document.getElementById('executeBtn').textContent='✓ MANEUVER VERIFIED';
+      showToast('COLLISION RISK REDUCED / MISSION PRESERVED');
+      pushAlert('MANEUVER VERIFIED',`Trajectory propagation completed. Predicted miss distance improved to ${d.miss.toFixed(2)} km and mission impact is preserved.`);
+    },1250);
+  });
+
+  document.getElementById('resetBtn').addEventListener('click',()=>{
+    safe=false;
+    spectateActive=false;
+    satelliteSpectate=false;
+    spectateTarget=null;
+    cameraMode='global';
+    selectThreat('debris-48291');
+    setManeuver('A');
+    document.getElementById('riskNum').textContent='2.70%';
+    document.getElementById('riskState').textContent='ELEVATED / ACTION RECOMMENDED';
+    document.getElementById('riskFill').style.width='27%';
+    document.getElementById('miss').textContent='0.84 KM';
+    document.getElementById('impact').textContent='UNRESOLVED';
+    document.getElementById('impact').className='';
+    document.getElementById('responseState').textContent='ANALYSIS';
+    document.getElementById('centerState').textContent='TRACKING 12,481 OBJECTS';
+    showToast('SCENARIO RESET');
+  });
+
+  // Camera views
+  document.querySelectorAll('[data-view]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('.view-btn').forEach(x=>x.classList.remove('active'));
+      btn.classList.add('active');
+      cameraMode=btn.dataset.view;
+      document.getElementById('viewRead').textContent=btn.dataset.view.toUpperCase()+' ORBIT';
+    });
+  });
+
+  document.getElementById('pauseBtn').addEventListener('click',e=>{
+    paused=!paused;
+    e.currentTarget.textContent=paused?'▶ RESUME':'Ⅱ PAUSE';
+    showToast(paused?'SIMULATION PAUSED':'SIMULATION RESUMED');
+  });
+
+  function animateNumber(id,from,to,duration,format){
+    const el=document.getElementById(id);
+    const start=performance.now();
+    function step(now){
+      const p=Math.min(1,(now-start)/duration);
+      const eased=1-Math.pow(1-p,3);
+      el.textContent=format(from+(to-from)*eased);
+      if(p<1)requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function showToast(text){
+    const t=document.getElementById('toast');
+    t.textContent=text;t.classList.add('show');
+    clearTimeout(window.toastTimer);
+    window.toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+  }
+
+  // Telemetry clocks
+  setInterval(()=>{
+    const now=new Date();
+    document.getElementById('utc').textContent=now.toISOString().slice(11,19);
+    const sec=Math.floor((Date.now()-startTime)/1000);
+    const h=String(Math.floor(sec/3600)).padStart(2,'0');
+    const m=String(Math.floor(sec%3600/60)).padStart(2,'0');
+    const s=String(sec%60).padStart(2,'0');
+    document.getElementById('uptime').textContent=`${h}:${m}:${s}`;
+  },1000);
+
+  // Small fake FPS readout for cinematic telemetry
+  let frames=0,last=performance.now();
+  function fpsLoop(now){
+    frames++;
+    if(now-last>700){
+      document.getElementById('fps').textContent=Math.round(frames*1000/(now-last));
+      frames=0;last=now;
+    }
+    requestAnimationFrame(fpsLoop);
+  }
+  requestAnimationFrame(fpsLoop);
+
+})();
+</script>
+</body>
+</html>
