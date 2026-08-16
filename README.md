@@ -1,409 +1,116 @@
-# FINAL README DIRECTION
+# 🛰️ NX-77 — Orbital Command Center
 
-The README must be written **based on the actual `index.html` website and its real functionality**.
+**NICOTECH-X Space Debris Collision Avoidance System**
+*Built with love by Team Nicotech*
 
-Do NOT write a generic README about what a hypothetical Orbital Guard system could do.
-
-Do NOT write a README based on assumptions about the project.
-
-**Inspect `index.html` carefully and use the actual website as the primary source of truth.**
-
----
-
-# THE README SHOULD ANSWER:
-
-When someone opens the repository, they should quickly understand:
-
-1. What is Orbital Guard?
-2. What problem does it address?
-3. What can I actually do on the website?
-4. What information does the website show me?
-5. What calculations/algorithms power those features?
-6. How do I explore the website?
-7. How do I understand the technical implementation?
-8. Which files correspond to which functionality?
-9. How can I run the individual algorithms myself?
-
----
-
-# DESCRIBE WHAT THE WEBSITE ACTUALLY DOES
-
-Inspect the website and identify its real functionality.
-
-For every meaningful feature, explain:
-
-```text id="c8i4ny"
-FEATURE
-   ↓
-What the user sees
-   ↓
-What the feature represents
-   ↓
-Underlying calculation / logic
-   ↓
-Corresponding technical file
-```
-
-For example, if the website contains a risk dashboard, explain the actual risk dashboard.
-
-If it contains orbital information, explain the actual orbital information shown.
-
-If it contains collision analysis, explain the actual collision analysis.
-
-If it contains visualizations, explain what those visualizations represent.
-
-If it contains simulation controls, explain what those controls actually do.
-
-**Do not invent additional capabilities.**
-
----
-
-# README STRUCTURE
-
-Build the README around the actual website.
-
-Use a structure similar to:
-
-```text id="4n6m2q"
-# 🛰️ Orbital Guard
-
-Project description
+A single-file, browser-based 3D mission control interface for monitoring a satellite (**NX-77**) in low Earth orbit, reviewing nearby debris conjunctions, and simulating a collision-avoidance maneuver — all rendered live with [Three.js](https://threejs.org/).
 
 ## 🌐 Live Demo
 
-Link to GitHub Pages
+The whole project is one self-contained file: `index.html`. There is no build step and no server — download the file and open it in any modern browser (Chrome/Edge/Firefox with WebGL2 support). An internet connection is needed on first load, since Three.js, the Earth/cloud textures, and the fonts are pulled from public CDNs.
 
-## 🚀 What is Orbital Guard?
+## 🚀 What is NX-77?
 
-What the project does.
+NX-77 is an interactive command-center screen for a fictional LEO satellite of the same name. It opens with a boot sequence and a title screen, then drops you into a 3D scene of Earth surrounded by orbital rings, a tracked debris field, and a set of flagged "conjunction" objects — pieces of debris whose orbits are projected to pass close to NX-77. From there you can inspect each threat, review the satellite's own orbital profile, and dial in an avoidance maneuver to see its effect on collision risk.
 
 ## 🎯 The Problem
 
-The problem the project addresses.
+Satellite operators have to continuously watch for debris and other objects whose orbits might intersect their own, judge how serious each conjunction is, and decide whether (and how) to burn fuel to shift the satellite's path. NX-77 dramatizes that workflow as a single, self-contained screen: a ranked list of conjunctions, a risk readout for whichever one is selected, and a small set of maneuver options to try before "executing" one.
 
-## 💡 How Orbital Guard Works
+## 💡 How NX-77 Works
 
-High-level explanation based on the actual website.
+Everything the interface shows is driven by two hand-authored JavaScript data objects that live inside `index.html`:
 
-## 🖥️ Explore the Website
+- **`threatData`** — five debris objects, each with a name, an estimated collision probability, a miss distance, a relative velocity, and a HIGH/MED/LOW threat level.
+- **`maneuverData`** — three preset avoidance maneuvers (A/B/C), each with a Δv (velocity change), a resulting collision risk, and a resulting miss distance.
 
-Walkthrough of the actual UI.
+Clicking a threat (in the side list or directly on its 3D marker) copies that object's numbers into every readout on screen — the risk panel, the miss-distance popup, the header. Choosing and "executing" a maneuver copies the matching `maneuverData` entry in the same way, animating the risk number down and flipping the mission-impact readout to "PRESERVED." The 3D positions of the satellite, debris field, and orbit rings are animated with simple trigonometric motion for visual effect — the numbers you read are the fixed dataset values, not a live physics computation, even though the SYSTEM tab labels the (display-only) processing core as `SGP4 / SDP4`.
 
-### Feature 1
-What it does.
+## 🖥️ Explore the Interface
 
-### Feature 2
-What it does.
+### Boot Sequence & Launch Screen
+On load, a boot overlay cycles through status lines ("INITIALIZING SENSOR ARRAY," "CALIBRATING CONJUNCTION SCREEN"...) with a progress bar, then reveals a title screen for the NICOTECH-X system. The **ENTER CONTROL PANEL →** button fades into the 3D command center and fires the first danger alert ("CONJUNCTION SCREENING ACTIVE").
 
-### Feature 3
-What it does.
+### 3D Orbital Scene
+The center of the screen is a live Three.js scene: a textured, rotating Earth with clouds and atmosphere glow, three faint orbital rings, a starfield, a satellite model orbiting on its own path, a field of ~480 small tracked-object points, and glowing markers for the five named debris threats, each trailing its own colored orbit line (red/amber/green by threat level). Drag to rotate the camera, scroll to zoom, and double-click to reset the view.
+
+### Mission Console (left panel, 4 tabs)
+- **OVERVIEW** — NX-77's status card: altitude, velocity, inclination, fuel reserve, OPERATIONAL status pill.
+- **THREATS** — the ranked list of all five conjunctions, each showing its miss distance, relative velocity, and HIGH/MED/LOW badge; clicking one selects it.
+- **SATELLITE** — NX-77's orbital elements: orbit type (LEO), perigee, apogee, period, status.
+- **SYSTEM** — display-only "processing core" readout (propagator, screening state, data source, engine, mode).
+
+### Threat Selection & Conjunction Popup
+Selecting a debris object — from the THREATS list or by clicking its marker in the 3D scene — highlights it, snaps the camera into a "spectate" mode that follows its orbit, opens a floating popup with its miss distance/relative velocity/risk, and pushes a danger or warning alert into the top-right alert stack depending on its threat level.
+
+### Threat Response Panel (right panel)
+- **Risk card** — the selected threat's collision probability as a large percentage, a status line ("ELEVATED / ACTION RECOMMENDED," etc.), and a proportional risk bar.
+- **Conjunction stats** — miss distance, time to closest approach, relative velocity, and mission-impact status.
+- **Maneuver optimizer** — three preset maneuvers (A: low Δv, B: max safety, C: clearance) selectable as buttons, plus a Δv slider (0.20–1.20 m/s) that updates the displayed magnitude live. **SIMULATE MANEUVER →** "executes" the selected maneuver: the risk number animates down to the maneuver's target value, miss distance updates, and the mission-impact readout turns green ("PRESERVED"). **RESET** returns the whole scenario to its starting state.
+
+### Camera & View Controls (bottom bar)
+Buttons for **GLOBAL**, **ASSET**, and **THREAT** camera framings, plus **PAUSE**, which freezes all orbital motion. Clicking the satellite model itself enters a satellite-spectate camera mode that follows NX-77 around its orbit; scrolling out or double-clicking exits any spectate mode.
+
+### Telemetry HUD
+Fixed side readouts for ground-station coordinates and link status (left) and UTC clock, session uptime, a live-measured FPS counter, and tracked-object count (right), all updating in real time while the page is open.
 
 ## 🧭 Technical Walkthrough
 
-Follow the technical implementation.
+The entire project is one file, `index.html`, organized top-to-bottom as:
 
-### Step 1
-Read ...
+1. **`<style>` (lines 9–352)** — all visual styling: the HUD/panel theme, boot screen, alert stack, buttons, sliders, and the custom cursor.
+2. **HTML markup (lines 355–556)** — the boot overlay, top/side telemetry readouts, launch screen, and the command-center layout (left mission console, 3D canvas, right threat-response panel, bottom camera bar).
+3. **`<script>` (lines 558–1162)** — the Three.js scene and all interface logic, loaded after Three.js itself from a CDN (line 557).
 
-### Step 2
-Open ...
+To see how a given feature is implemented, open `index.html` and jump to:
 
-### Step 3
-Run ...
+| What you see | Where it lives in `index.html` |
+|---|---|
+| Earth, clouds, atmosphere, orbit rings, satellite model, debris field, conjunction paths | lines ~560–754 (Three.js scene construction) |
+| The five debris conjunctions and their numbers | `threatData` object, lines ~691–697 |
+| Drag-to-rotate / wheel-to-zoom / double-click-reset camera | pointer & wheel listeners, lines ~821–843 |
+| Threat & satellite "spectate" follow-camera | `enterSpectate` / `enterSatelliteSpectate` / `exitSpectate`, lines ~782–819, and the camera-follow branch in the render loop, lines ~885–897 |
+| Procedural motion of debris markers along their orbits | `placeThreats()`, lines ~846–866 |
+| Main render/animation loop | `render()`, lines ~868–909 |
+| Boot progress sequence | lines ~917–940 |
+| Launch screen → command center transition | lines ~942–963 |
+| Mission Console tab switching | lines ~965–973 |
+| Selecting a threat (list click or 3D-marker click) and updating every readout | `selectThreat()`, lines ~977–1000, plus the raycasting click handler, lines ~1002–1030 |
+| Maneuver presets A/B/C and the Δv slider | `maneuverData` object and `setManeuver()`, lines ~1032–1059 |
+| "Simulating" a maneuver (risk animating down, impact turning green) | the `executeBtn` click handler, lines ~1061–1082 |
+| Resetting the scenario | `resetBtn` click handler, lines ~1084–1101 |
+| Global/Asset/Threat camera-mode buttons and Pause | lines ~1103–1117 |
+| Smooth animated number transitions (e.g. the risk %) | `animateNumber()`, lines ~1119–1129 |
+| Toast notifications and the alert stack | `showToast()` / `pushAlert()`, lines ~949, 1131–1136 |
+| UTC clock, session uptime, live FPS counter | lines ~1138–1159 |
 
-## 🧮 Algorithms
+## 🧪 Experiment With It
 
-Table connecting website functionality to implementation.
+Since there's no build step, the fastest way to try changes is directly in the file or in the browser devtools:
 
-## 🔗 How Everything Connects
-
-System flow.
-
-## 🧪 Experiment With the Algorithms
-
-Things the reader can modify/run.
+- **Change the threat picture**: edit the `threatData` object (line ~691) to add debris, rename objects, or change their risk/miss/relative-velocity numbers — the THREATS list, risk panel, and popup all read from this one object.
+- **Change the maneuver options**: edit `maneuverData` (line ~1033) to try different Δv/risk/miss combinations for maneuvers A, B, and C.
+- **Adjust the visuals**: the orbit radii (`orbitRadii`, line ~659), debris field size (`debrisCount`, line ~718), and camera zoom limits (in the `wheel` listener, line ~826) are plain constants near the top of the script.
+- **Inspect live state**: with the page open, the browser console has direct access to the scene's variables (`threatData`, `maneuverData`, `selectedId`, `cameraMode`, etc.) since the script runs in an IIFE but Three.js objects are reachable via the DOM/console for debugging.
 
 ## 📁 Repository Structure
 
-Explain the files.
+```
+NX-77_NICOTECH_Space_Debris_Control.html   ← the entire project: markup, styles, and logic in one file
+```
+
+There are no separate source modules, stylesheets, or data files — CSS, HTML, and JavaScript (including the two data objects that drive every readout) all live inside this single `index.html`.
 
 ## 🛠️ Running the Project
 
-Website + standalone modules.
+No installation or dependencies to manage locally:
 
-## 🔮 Future Development
+1. Download `index.html`.
+2. Open it in a WebGL2-capable browser (double-click it, or drag it into a browser window).
+3. Keep an internet connection available for the first load — Three.js, the Earth/cloud textures, and the Google Fonts used by the HUD are all fetched from CDNs at runtime.
 
-Only if appropriate.
+To host it as a live demo, any static file host (GitHub Pages, Netlify, a plain web server) works, since the page has no backend or server-side dependency.
 
-## 👨‍💻 Project / Team
+## 🔮 Limitations
 
-If information is provided.
-```
-
-Adapt this structure to the actual project.
-
----
-
-# FEATURE-DRIVEN DOCUMENTATION
-
-This is extremely important.
-
-Do NOT organize the README primarily around files.
-
-Organize it around **what the user experiences on the website**.
-
-For example, instead of:
-
-```text
-## Files
-
-risk.py
-distance.py
-simulation.py
-```
-
-prefer:
-
-```text
-## 🛰️ Orbital Monitoring
-
-Orbital Guard presents [actual functionality].
-
-To understand the calculation behind this feature:
-
-📖 Read:
-documentation/orbital_calculation.md
-
-💻 Implementation:
-algorithms/orbital_calculation.py
-
-▶ Run:
-python algorithms/orbital_calculation.py
-```
-
-This creates a direct connection between:
-
-**Website Feature → Algorithm → Code → Execution**
-
----
-
-# USE THE WEBSITE AS THE STORY
-
-The README should feel like someone is walking through the actual Orbital Guard interface.
-
-For example:
-
-```text id="svl2av"
-Open the website.
-
-↓
-
-Look at the main dashboard.
-
-↓
-
-Notice the orbital information.
-
-↓
-
-Explore the risk indicators.
-
-↓
-
-Look at the calculated values.
-
-↓
-
-Understand what those values represent.
-
-↓
-
-Now open the technical documentation.
-
-↓
-
-Read the algorithm responsible for that calculation.
-
-↓
-
-Open the corresponding Python file.
-
-↓
-
-Run it.
-
-↓
-
-Return to the website.
-
-↓
-
-Now you can recognize how the calculation
-is represented in the interface.
-```
-
-The exact sequence should be based on the actual UI.
-
----
-
-# DO NOT CENTER THE README AROUND WHAT THE PROJECT DOES NOT DO
-
-Avoid sections or repeated statements such as:
-
-* "There is no backend"
-* "This isn't a production system"
-* "This doesn't use a database"
-* "This isn't connected to real satellites"
-* "This doesn't provide real-time tracking"
-* "This is only a demo"
-* "This doesn't have an API"
-
-**unless one of these is genuinely necessary to prevent a serious misunderstanding.**
-
-The README is primarily a presentation of the project's **capabilities and implementation**, not a list of missing capabilities.
-
-If limitations need to be mentioned, keep them short and place them near the end.
-
----
-
-# DO NOT INVENT FEATURES TO MAKE THE README SOUND IMPRESSIVE
-
-This is equally important.
-
-If the website has:
-
-```text id="f7o6r3"
-Feature A
-Feature B
-Feature C
-```
-
-document A, B, and C.
-
-Do NOT turn them into:
-
-```text id="p8t9kw"
-Feature A
-Feature B
-Feature C
-AI-powered prediction
-Real-time satellite tracking
-Global collision avoidance
-Advanced machine learning
-```
-
-unless those capabilities actually exist in the provided project.
-
-**Accuracy is more important than sounding impressive.**
-
----
-
-# TECHNICAL DEPTH
-
-The README should remain readable.
-
-Do not put every mathematical derivation inside the README.
-
-Instead:
-
-```text id="kzv7z3"
-README
-  ↓
-High-level explanation
-  ↓
-Technical Documentation
-  ↓
-Algorithm Documentation
-  ↓
-Standalone Code
-```
-
-Use the README to **guide the reader** toward the deeper material.
-
----
-
-# THE README SHOULD FEEL LIKE A JOURNEY
-
-The reader should naturally move through:
-
-```text id="5u1rcr"
-WHAT
- ↓
-WHY
- ↓
-EXPLORE
- ↓
-HOW
- ↓
-ALGORITHM
- ↓
-CODE
- ↓
-RUN
- ↓
-CONNECT
-```
-
-Not:
-
-```text id="e0c5oq"
-DESCRIPTION
-INSTALLATION
-FILES
-LICENSE
-DONE
-```
-
----
-
-# IMPORTANT: READ THE ACTUAL HTML BEFORE WRITING
-
-Before generating the README:
-
-1. Inspect `index.html`.
-2. Identify every major section of the UI.
-3. Identify every interactive feature.
-4. Identify every calculation.
-5. Identify the data represented.
-6. Identify the algorithms/logic embedded in the HTML/JavaScript.
-7. Map each important feature to its standalone technical implementation.
-8. Build the README around that map.
-
-Do not write the README until you understand the website.
-
----
-
-# FINAL STANDARD
-
-Someone who has never seen Orbital Guard should be able to open the README and think:
-
-> "I know what this project is."
-
-Then:
-
-> "I know where the actual website is."
-
-Then:
-
-> "I know what I'm looking at when I open it."
-
-Then:
-
-> "I know how this feature works."
-
-Then:
-
-> "I know which file implements that logic."
-
-Then:
-
-> "I can run that implementation myself."
-
-Then:
-
-> "I understand how all the pieces come together."
-
-That is the standard the README should meet.
-
-**The README should document and showcase the Orbital Guard that actually exists — based directly on `index.html` — rather than discussing an imagined larger system or focusing on what the project lacks.**
-
+The collision-risk, miss-distance, and maneuver figures come from the fixed `threatData` and `maneuverData` objects rather than a live orbital-mechanics computation, and the SYSTEM tab's `SGP4 / SDP4` and `PUBLIC GP DATA` labels are part of the mission-console display rather than an active data feed.
