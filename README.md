@@ -15,12 +15,21 @@ pip install -r requirements-dev.txt   # pytest
 ## Run
 
 ```bash
-python -m pytest tests/ -v          # 13 tests
+python -m pytest tests/ -v          # unit tests
 python run_simulation.py            # Phase 1 pipeline
 python run_demo.py --scenario HIGH_RISK
 python run_demo.py --scenario NO_MANEUVER
 ```
 
-Frontend integration: `backend.service.run_scenario` — see `docs/FRONTEND_INTEGRATION.md`.
+### Full GUI (recommended for demo)
+
+```bash
+pip install fastapi uvicorn          # once
+PYTHONPATH=. python api_server.py    # serves UI + API on :8000
+```
+
+Open http://127.0.0.1:8000 — PS-02 Orbital Command Center drives real `backend.service.run_scenario`.
+
+Details: `FRONTEND_RUN.md`, `docs/FRONTEND_INTEGRATION.md`.
 
 Full docs: `RUN_PROJECT.md`, `PROJECT_HISTORY.md`, `WHAT_WE_BUILT.md`, `JUDGE_QA.md`, `BENCHMARK_SUMMARY.md`, `PRESENTATION_GUARDRAILS.md`.
